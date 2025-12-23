@@ -7,8 +7,8 @@ from pathlib import Path
 from typing import List, Set
 
 from textual.app import App, ComposeResult
-from textual.containers import Container, Vertical, Horizontal
-from textual.widgets import Header, Footer, DirectoryTree, Static, Button, Input
+from textual.containers import Container, Vertical
+from textual.widgets import Header, Footer, DirectoryTree, Static, Button
 from textual.binding import Binding
 
 from src.config import DatabaseConfig
@@ -25,27 +25,10 @@ class GrailFileBrowser(App):
     }
 
     #info-panel {
-        height: 5;
-        background: $panel;
-        border: solid $primary;
-        padding: 0 1;
-    }
-
-    #path-input-container {
         height: 3;
         background: $panel;
         border: solid $primary;
         padding: 0 1;
-        layout: horizontal;
-    }
-
-    #path-label {
-        width: 10;
-        content-align: left middle;
-    }
-
-    #path-input {
-        width: 1fr;
     }
 
     #tree-container {
@@ -85,42 +68,33 @@ class GrailFileBrowser(App):
     BINDINGS = [
         Binding("q", "quit", "Quit"),
         Binding("i", "ingest", "Ingest Selected"),
-        Binding("h", "go_home", "Go to Home"),
-        Binding("r", "go_root", "Go to Root"),
+        Binding("u", "go_up", "Parent Dir"),
         ("escape", "quit", "Quit"),
     ]
 
-    def __init__(self, db_config: DatabaseConfig, database_name: str = None, start_path: str = None):
+    def __init__(self, db_config: DatabaseConfig, database_name: str = None):
         super().__init__()
         self.db_config = db_config
         self.database_name = database_name
         self.selected_files: Set[Path] = set()
         self.title = "Save Grail JSON - File Browser"
-        self.start_path = start_path or os.getcwd()
+        self.current_path = Path(os.getcwd())
 
     def compose(self) -> ComposeResult:
         """Create child widgets."""
         yield Header()
         yield Container(
             Static(
-                "↑/↓: Navigate | Enter: Expand/collapse | Space: Select JSON | i: Ingest | h: Home | r: Root | q: Quit",
+                "Navigate with arrow keys. Press Space to select/deselect JSON files. Press 'i' to ingest. Press 'u' for parent dir.",
                 id="info-panel"
             ),
             Container(
-                Horizontal(
-                    Static("Path:", id="path-label"),
-                    Input(value=self.start_path, placeholder="Enter path...", id="path-input"),
-                    id="path-input-container"
-                ),
-            ),
-            Container(
-                DirectoryTree(self.start_path, id="file-tree"),
+                DirectoryTree(str(self.current_path), id="file-tree"),
                 id="tree-container"
             ),
             Container(
                 Button("Ingest Selected (i)", id="ingest-btn", variant="primary"),
-                Button("Home (h)", id="home-btn", variant="default"),
-                Button("Root (r)", id="root-btn", variant="default"),
+                Button("Up to Parent (u)", id="up-btn", variant="default"),
                 Button("Quit (q)", id="quit-btn", variant="default"),
                 id="button-container"
             ),
@@ -153,64 +127,36 @@ class GrailFileBrowser(App):
         """Handle button presses."""
         if event.button.id == "ingest-btn":
             self.action_ingest()
-        elif event.button.id == "home-btn":
-            self.action_go_home()
-        elif event.button.id == "root-btn":
-            self.action_go_root()
+        elif event.button.id == "up-btn":
+            self.action_go_up()
         elif event.button.id == "quit-btn":
             self.action_quit()
 
-    def on_input_submitted(self, event: Input.Submitted) -> None:
-        """Handle path input submission."""
-        if event.input.id == "path-input":
-            new_path = event.value.strip()
-            if new_path:
-                self.change_directory(new_path)
+    def action_go_up(self) -> None:
+        """Navigate to parent directory."""
+        parent = self.current_path.parent
 
-    def action_go_home(self) -> None:
-        """Navigate to home directory."""
-        home_path = str(Path.home())
-        self.change_directory(home_path)
-
-    def action_go_root(self) -> None:
-        """Navigate to root directory."""
-        self.change_directory("/")
-
-    def change_directory(self, path: str) -> None:
-        """
-        Change the directory tree to a new path.
-
-        Args:
-            path: Path to navigate to
-        """
-        path_obj = Path(path).expanduser().resolve()
-
-        if not path_obj.exists():
-            self.update_status(f"Path does not exist: {path}", "error")
+        # Check if we're already at root
+        if parent == self.current_path:
+            self.update_status("Already at root directory", "warning")
             return
 
-        if not path_obj.is_dir():
-            self.update_status(f"Not a directory: {path}", "error")
-            return
+        self.current_path = parent
 
         # Remove old tree and create new one
         try:
             old_tree = self.query_one("#file-tree", DirectoryTree)
             old_tree.remove()
 
-            # Create new tree with new path
-            new_tree = DirectoryTree(str(path_obj), id="file-tree")
+            # Create new tree with parent path
+            new_tree = DirectoryTree(str(self.current_path), id="file-tree")
             tree_container = self.query_one("#tree-container")
             tree_container.mount(new_tree)
 
-            # Update path input
-            path_input = self.query_one("#path-input", Input)
-            path_input.value = str(path_obj)
-
-            self.update_status(f"Changed to: {path_obj}")
+            self.update_status(f"Up to: {self.current_path}")
 
         except Exception as e:
-            self.update_status(f"Error changing directory: {e}", "error")
+            self.update_status(f"Error navigating up: {e}", "error")
 
     def action_ingest(self) -> None:
         """Ingest all selected files."""
