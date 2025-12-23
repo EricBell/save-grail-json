@@ -97,7 +97,8 @@ class GrailDatabase:
 
     def _ensure_schema_exists(self):
         """Create table schema if it doesn't exist."""
-        schema_sql = """
+        # Create table with new schema
+        table_sql = """
         CREATE TABLE IF NOT EXISTS grail_files (
             id SERIAL PRIMARY KEY,
             ticker VARCHAR(20),
@@ -110,25 +111,33 @@ class GrailDatabase:
             ingested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
-
-        CREATE INDEX IF NOT EXISTS idx_ticker ON grail_files(ticker);
-        CREATE INDEX IF NOT EXISTS idx_asset_type ON grail_files(asset_type);
-        CREATE INDEX IF NOT EXISTS idx_ingested_at ON grail_files(ingested_at);
-        CREATE INDEX IF NOT EXISTS idx_content_hash ON grail_files(content_hash);
         """
 
         try:
-            self.cursor.execute(schema_sql)
+            self.cursor.execute(table_sql)
             self.conn.commit()
 
             # Add content_hash column to existing tables (migration)
             self._migrate_add_content_hash()
+
+            # Create indexes (safe to run after migration)
+            index_sql = """
+            CREATE INDEX IF NOT EXISTS idx_ticker ON grail_files(ticker);
+            CREATE INDEX IF NOT EXISTS idx_asset_type ON grail_files(asset_type);
+            CREATE INDEX IF NOT EXISTS idx_ingested_at ON grail_files(ingested_at);
+            CREATE INDEX IF NOT EXISTS idx_content_hash ON grail_files(content_hash);
+            """
+            self.cursor.execute(index_sql)
+            self.conn.commit()
+
         except psycopg2.Error as e:
             self.conn.rollback()
             raise DatabaseError(f"Failed to create table schema: {e}")
 
     def _migrate_add_content_hash(self):
         """Add content_hash and updated_at columns to existing tables if needed."""
+        import hashlib
+
         try:
             # Check if content_hash column exists
             self.cursor.execute("""
@@ -136,44 +145,51 @@ class GrailDatabase:
                 FROM information_schema.columns
                 WHERE table_name='grail_files' AND column_name='content_hash'
             """)
+            result = self.cursor.fetchone()
 
-            if not self.cursor.fetchone():
-                # Column doesn't exist, add it (for existing installations)
-                import hashlib
+            # Column already exists, nothing to do
+            if result:
+                return
 
-                # Add columns without constraints first
-                self.cursor.execute("""
-                    ALTER TABLE grail_files
-                    ADD COLUMN IF NOT EXISTS content_hash VARCHAR(64),
-                    ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                """)
-                self.conn.commit()
+            # Column doesn't exist, add it (for existing installations)
+            # Add columns without constraints first
+            self.cursor.execute("""
+                ALTER TABLE grail_files
+                ADD COLUMN IF NOT EXISTS content_hash VARCHAR(64),
+                ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            """)
+            self.conn.commit()
 
-                # Compute hashes for existing records
-                self.cursor.execute("SELECT id, json_content FROM grail_files")
-                rows = self.cursor.fetchall()
+            # Compute hashes for existing records
+            self.cursor.execute("SELECT id, json_content FROM grail_files")
+            rows = self.cursor.fetchall()
 
-                for row_id, json_content in rows:
-                    content_hash = hashlib.sha256(json_content.encode('utf-8')).hexdigest()
-                    self.cursor.execute(
-                        "UPDATE grail_files SET content_hash = %s WHERE id = %s",
-                        (content_hash, row_id)
-                    )
-                self.conn.commit()
+            for row_id, json_content in rows:
+                content_hash = hashlib.sha256(json_content.encode('utf-8')).hexdigest()
+                self.cursor.execute(
+                    "UPDATE grail_files SET content_hash = %s WHERE id = %s",
+                    (content_hash, row_id)
+                )
+            self.conn.commit()
 
-                # Now add constraints
-                self.cursor.execute("""
-                    ALTER TABLE grail_files
-                    ALTER COLUMN content_hash SET NOT NULL
-                """)
-                self.cursor.execute("""
-                    ALTER TABLE grail_files
-                    ADD CONSTRAINT grail_files_content_hash_key UNIQUE (content_hash)
-                """)
-                self.conn.commit()
+            # Now add constraints
+            self.cursor.execute("""
+                ALTER TABLE grail_files
+                ALTER COLUMN content_hash SET NOT NULL
+            """)
+            self.conn.commit()
+
+            self.cursor.execute("""
+                ALTER TABLE grail_files
+                ADD CONSTRAINT grail_files_content_hash_key UNIQUE (content_hash)
+            """)
+            self.conn.commit()
+
         except psycopg2.Error as e:
-            # If migration fails, it's likely already done or table is new
+            # If migration fails, rollback and re-raise
             self.conn.rollback()
+            # Don't raise - let the caller handle it
+            pass
 
     def insert_grail_file(
         self,
