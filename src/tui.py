@@ -143,16 +143,10 @@ class GrailFileBrowser(App):
 
         self.current_path = parent
 
-        # Remove old tree and create new one
+        # Update the tree path
         try:
-            old_tree = self.query_one("#file-tree", DirectoryTree)
-            old_tree.remove()
-
-            # Create new tree with parent path
-            new_tree = DirectoryTree(str(self.current_path), id="file-tree")
-            tree_container = self.query_one("#tree-container")
-            tree_container.mount(new_tree)
-
+            tree = self.query_one("#file-tree", DirectoryTree)
+            tree.path = str(self.current_path)
             self.update_status(f"Up to: {self.current_path}")
 
         except Exception as e:
