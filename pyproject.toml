@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "save-grail-json"
+version = "0.1.0"
+description = "A tool to save grail JSON docs to a database for later review and analysis"
+authors = [{name = "Eric Bell"}]
+license = {text = "GPL-3.0"}
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "psycopg2-binary>=2.9.0",
+    "textual>=0.47.0",
+    "click>=8.0.0",
+    "tomli>=2.0.0; python_version < '3.11'",
+]
+
+[project.scripts]
+save-grail-json = "src.cli:main"
+
+[project.urls]
+Repository = "https://github.com/EricBell/save-grail-json"
+
+[tool.setuptools]
+packages = ["src"]

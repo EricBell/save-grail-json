@@ -42,11 +42,57 @@ chmod 600 ~/.config/postgres/save-grail-json.toml
 
 ## Development Commands
 
-To be documented once the project structure is established. Typical commands will include:
-- Installation/setup
-- Running tests
-- Linting/formatting
-- Building/deploying
+### Installation
+```bash
+# Install in development mode
+pip install -e .
+
+# Or install dependencies directly
+pip install -r requirements.txt
+```
+
+### Running the Application
+```bash
+# CLI mode - ingest specific files
+python -m src.cli file1.json file2.json
+
+# CLI mode - with glob patterns
+python -m src.cli data/*.json
+
+# TUI mode - interactive file browser
+python -m src.cli --tui
+
+# Custom config file
+python -m src.cli --config /path/to/config.toml file.json
+
+# Custom database name
+python -m src.cli --database my_database file.json
+
+# After installation via pip install -e .
+save-grail-json file1.json
+save-grail-json --tui
+```
+
+### Testing
+```bash
+# Run tests (when implemented)
+pytest tests/
+
+# Run specific test file
+pytest tests/test_ingestion.py
+```
+
+### Linting/Formatting
+```bash
+# Format code
+black src/
+
+# Lint code
+ruff check src/
+
+# Type checking
+mypy src/
+```
 
 ## Architecture
 
@@ -56,12 +102,29 @@ To be documented once the project structure is established. Typical commands wil
 - **TUI Framework:** Textual
 - **Dependencies:** psycopg2/psycopg3, tomli/tomllib
 
-### Module Structure (Planned)
-- `cli.py` - Command-line interface and argument parsing
-- `config.py` - TOML configuration loading
-- `database.py` - PostgreSQL connection and operations
-- `ingestion.py` - JSON file reading and field extraction
-- `tui.py` - Interactive file browser using Textual
+### Module Structure
+- `src/__init__.py` - Package initialization
+- `src/cli.py` - Command-line interface using Click
+  - Main entry point with `main()` function
+  - Handles CLI and TUI mode selection
+  - File processing and progress reporting
+- `src/config.py` - TOML configuration loading
+  - `DatabaseConfig` class loads from `~/.config/postgres/save-grail-json.toml`
+  - Supports config override via `--config` flag or `GRAIL_DB_CONFIG` env var
+  - Validates required fields (host, port, user, password)
+- `src/database.py` - PostgreSQL connection and operations
+  - `GrailDatabase` class with context manager support
+  - Creates database and table schema if needed
+  - `insert_grail_file()` handles duplicate detection via UNIQUE constraint
+- `src/ingestion.py` - JSON file reading and field extraction
+  - `GrailFileData` dataclass for extracted information
+  - `ingest_json_file()` reads JSON and extracts ticker, asset_type
+  - Gets file creation/modification timestamps
+- `src/tui.py` - Interactive file browser using Textual
+  - `GrailFileBrowser` app with directory tree navigation
+  - Space to select/deselect JSON files
+  - 'i' key or button to ingest selected files
+  - Real-time status updates and error handling
 
 ### Data Flow
 1. User specifies files (CLI) or selects files (TUI)
