@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=45", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "save-grail-json"
@@ -23,5 +23,5 @@ save-grail-json = "src.cli:main"
 [project.urls]
 Repository = "https://github.com/EricBell/save-grail-json"
 
-[tool.setuptools]
+[tool.hatch.build.targets.wheel]
 packages = ["src"]

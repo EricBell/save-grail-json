@@ -44,60 +44,65 @@ chmod 600 ~/.config/postgres/save-grail-json.toml
 
 ### Installation
 ```bash
-# Install in development mode
-pip install -e .
+# Install dependencies and sync the project (creates .venv and uv.lock)
+uv sync
 
-# Or install dependencies directly
-pip install -r requirements.txt
+# Add a new dependency
+uv add package-name
+
+# Add a development dependency
+uv add --dev package-name
 ```
 
 ### Running the Application
 ```bash
 # CLI mode - ingest specific files
-python -m src.cli file1.json file2.json
+uv run python -m src.cli file1.json file2.json
 
 # CLI mode - with glob patterns
-python -m src.cli data/*.json
+uv run python -m src.cli data/*.json
 
 # TUI mode - interactive file browser
-python -m src.cli --tui
+uv run python -m src.cli --tui
 
 # Custom config file
-python -m src.cli --config /path/to/config.toml file.json
+uv run python -m src.cli --config /path/to/config.toml file.json
 
 # Custom database name
-python -m src.cli --database my_database file.json
+uv run python -m src.cli --database my_database file.json
 
-# After installation via pip install -e .
-save-grail-json file1.json
-save-grail-json --tui
+# Using the installed command directly
+uv run save-grail-json file1.json
+uv run save-grail-json --tui
 ```
 
 ### Testing
 ```bash
 # Run tests (when implemented)
-pytest tests/
+uv run pytest tests/
 
 # Run specific test file
-pytest tests/test_ingestion.py
+uv run pytest tests/test_ingestion.py
 ```
 
 ### Linting/Formatting
 ```bash
 # Format code
-black src/
+uv run black src/
 
 # Lint code
-ruff check src/
+uv run ruff check src/
 
 # Type checking
-mypy src/
+uv run mypy src/
 ```
 
 ## Architecture
 
 ### Technology Stack
 - **Language:** Python 3.8+
+- **Package Manager:** uv
+- **Build Backend:** hatchling
 - **Database:** PostgreSQL
 - **TUI Framework:** Textual
 - **Dependencies:** psycopg2/psycopg3, tomli/tomllib
