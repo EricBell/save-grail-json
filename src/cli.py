@@ -72,9 +72,10 @@ def process_files(file_paths: List[str], db_config: DatabaseConfig, database_nam
         database_name: Optional database name override
     """
     total_files = len(file_paths)
-    success_count = 0
-    error_count = 0
+    inserted_count = 0
+    updated_count = 0
     duplicate_count = 0
+    error_count = 0
 
     click.echo(f"Processing {total_files} file(s)...\n")
 
@@ -85,21 +86,25 @@ def process_files(file_paths: List[str], db_config: DatabaseConfig, database_nam
                     # Ingest the file
                     file_data = ingest_json_file(file_path)
 
-                    # Insert into database
-                    inserted = db.insert_grail_file(
+                    # Insert/update in database
+                    result = db.insert_grail_file(
                         file_path=file_data.file_path,
                         json_content=file_data.json_content,
+                        content_hash=file_data.content_hash,
                         ticker=file_data.ticker,
                         asset_type=file_data.asset_type,
                         file_created_at=file_data.file_created_at,
                         file_modified_at=file_data.file_modified_at
                     )
 
-                    if inserted:
-                        click.echo(f"✓ {file_path}")
-                        success_count += 1
-                    else:
-                        click.echo(f"⊘ {file_path} (already in database)", err=True)
+                    if result == 'inserted':
+                        click.echo(f"✓ {file_path} (new)")
+                        inserted_count += 1
+                    elif result == 'updated':
+                        click.echo(f"↻ {file_path} (updated)")
+                        updated_count += 1
+                    elif result == 'duplicate':
+                        click.echo(f"⊘ {file_path} (duplicate content, skipped)")
                         duplicate_count += 1
 
                 except IngestionError as e:
@@ -116,7 +121,9 @@ def process_files(file_paths: List[str], db_config: DatabaseConfig, database_nam
 
     # Summary
     click.echo(f"\n{'='*60}")
-    click.echo(f"Successfully ingested: {success_count} file(s)")
+    click.echo(f"Inserted (new):        {inserted_count} file(s)")
+    if updated_count > 0:
+        click.echo(f"Updated (changed):     {updated_count} file(s)")
     if duplicate_count > 0:
         click.echo(f"Skipped (duplicates):  {duplicate_count} file(s)")
     if error_count > 0:

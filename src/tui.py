@@ -160,9 +160,10 @@ class GrailFileBrowser(App):
 
         files = list(self.selected_files)
         total = len(files)
-        success = 0
-        errors = 0
+        inserted = 0
+        updated = 0
         duplicates = 0
+        errors = 0
 
         self.update_status(f"Ingesting {total} file(s)...", "")
 
@@ -173,20 +174,24 @@ class GrailFileBrowser(App):
                         # Ingest the file
                         file_data = ingest_json_file(str(file_path))
 
-                        # Insert into database
-                        inserted = db.insert_grail_file(
+                        # Insert/update in database
+                        result = db.insert_grail_file(
                             file_path=file_data.file_path,
                             json_content=file_data.json_content,
+                            content_hash=file_data.content_hash,
                             ticker=file_data.ticker,
                             asset_type=file_data.asset_type,
                             file_created_at=file_data.file_created_at,
                             file_modified_at=file_data.file_modified_at
                         )
 
-                        if inserted:
-                            success += 1
-                            self.update_status(f"[{i}/{total}] ✓ {file_path.name}", "success")
-                        else:
+                        if result == 'inserted':
+                            inserted += 1
+                            self.update_status(f"[{i}/{total}] ✓ {file_path.name} (new)", "success")
+                        elif result == 'updated':
+                            updated += 1
+                            self.update_status(f"[{i}/{total}] ↻ {file_path.name} (updated)", "success")
+                        elif result == 'duplicate':
                             duplicates += 1
                             self.update_status(f"[{i}/{total}] ⊘ {file_path.name} (duplicate)", "warning")
 
@@ -202,12 +207,17 @@ class GrailFileBrowser(App):
         self.selected_files.clear()
 
         # Final summary
-        summary = f"Complete: {success} ingested"
+        summary_parts = []
+        if inserted > 0:
+            summary_parts.append(f"{inserted} new")
+        if updated > 0:
+            summary_parts.append(f"{updated} updated")
         if duplicates > 0:
-            summary += f", {duplicates} duplicates"
+            summary_parts.append(f"{duplicates} duplicates")
         if errors > 0:
-            summary += f", {errors} errors"
+            summary_parts.append(f"{errors} errors")
 
+        summary = "Complete: " + ", ".join(summary_parts) if summary_parts else "Complete"
         style = "success" if errors == 0 else "warning"
         self.update_status(summary, style)
 

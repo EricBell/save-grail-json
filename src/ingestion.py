@@ -3,6 +3,7 @@ JSON file ingestion and field extraction.
 """
 
 import json
+import hashlib
 import os
 from datetime import datetime
 from pathlib import Path
@@ -21,6 +22,7 @@ class GrailFileData:
         self,
         file_path: str,
         json_content: str,
+        content_hash: str,
         ticker: Optional[str] = None,
         asset_type: Optional[str] = None,
         file_created_at: Optional[datetime] = None,
@@ -28,6 +30,7 @@ class GrailFileData:
     ):
         self.file_path = file_path
         self.json_content = json_content
+        self.content_hash = content_hash
         self.ticker = ticker
         self.asset_type = asset_type
         self.file_created_at = file_created_at
@@ -86,9 +89,13 @@ def ingest_json_file(file_path: str) -> GrailFileData:
         file_created_at = None
         file_modified_at = None
 
+    # Compute content hash for duplicate detection
+    content_hash = hashlib.sha256(json_content.encode('utf-8')).hexdigest()
+
     return GrailFileData(
         file_path=str(path.absolute()),
         json_content=json_content,
+        content_hash=content_hash,
         ticker=ticker,
         asset_type=asset_type,
         file_created_at=file_created_at,

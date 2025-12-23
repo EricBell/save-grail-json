@@ -103,75 +103,160 @@ class GrailDatabase:
             ticker VARCHAR(20),
             asset_type VARCHAR(50),
             file_path TEXT NOT NULL UNIQUE,
+            content_hash VARCHAR(64) NOT NULL UNIQUE,
             file_created_at TIMESTAMP,
             file_modified_at TIMESTAMP,
             json_content TEXT NOT NULL,
-            ingested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ingested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
         CREATE INDEX IF NOT EXISTS idx_ticker ON grail_files(ticker);
         CREATE INDEX IF NOT EXISTS idx_asset_type ON grail_files(asset_type);
         CREATE INDEX IF NOT EXISTS idx_ingested_at ON grail_files(ingested_at);
+        CREATE INDEX IF NOT EXISTS idx_content_hash ON grail_files(content_hash);
         """
 
         try:
             self.cursor.execute(schema_sql)
             self.conn.commit()
+
+            # Add content_hash column to existing tables (migration)
+            self._migrate_add_content_hash()
         except psycopg2.Error as e:
             self.conn.rollback()
             raise DatabaseError(f"Failed to create table schema: {e}")
+
+    def _migrate_add_content_hash(self):
+        """Add content_hash and updated_at columns to existing tables if needed."""
+        try:
+            # Check if content_hash column exists
+            self.cursor.execute("""
+                SELECT column_name
+                FROM information_schema.columns
+                WHERE table_name='grail_files' AND column_name='content_hash'
+            """)
+
+            if not self.cursor.fetchone():
+                # Column doesn't exist, add it (for existing installations)
+                import hashlib
+
+                # Add columns
+                self.cursor.execute("""
+                    ALTER TABLE grail_files
+                    ADD COLUMN IF NOT EXISTS content_hash VARCHAR(64),
+                    ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                """)
+
+                # Compute hashes for existing records
+                self.cursor.execute("SELECT id, json_content FROM grail_files WHERE content_hash IS NULL")
+                for row_id, json_content in self.cursor.fetchall():
+                    content_hash = hashlib.sha256(json_content.encode('utf-8')).hexdigest()
+                    self.cursor.execute(
+                        "UPDATE grail_files SET content_hash = %s WHERE id = %s",
+                        (content_hash, row_id)
+                    )
+
+                # Now add constraints
+                self.cursor.execute("""
+                    ALTER TABLE grail_files
+                    ALTER COLUMN content_hash SET NOT NULL,
+                    ADD CONSTRAINT grail_files_content_hash_key UNIQUE (content_hash)
+                """)
+
+                self.conn.commit()
+        except psycopg2.Error:
+            # If migration fails, it's likely already done or table is new
+            self.conn.rollback()
 
     def insert_grail_file(
         self,
         file_path: str,
         json_content: str,
+        content_hash: str,
         ticker: Optional[str] = None,
         asset_type: Optional[str] = None,
         file_created_at: Optional[datetime] = None,
         file_modified_at: Optional[datetime] = None
-    ) -> bool:
+    ) -> str:
         """
-        Insert a grail JSON file into the database.
+        Insert or update a grail JSON file in the database.
 
         Args:
             file_path: Path to the JSON file
             json_content: Complete JSON content as string
+            content_hash: SHA256 hash of json_content
             ticker: Ticker symbol extracted from JSON
             asset_type: Asset type extracted from JSON
             file_created_at: File creation timestamp
             file_modified_at: File modification timestamp
 
         Returns:
-            True if inserted successfully, False if duplicate (already exists)
+            'inserted' - New file added
+            'updated' - Existing file path updated with new content
+            'duplicate' - Same content already exists (skipped)
 
         Raises:
-            DatabaseError: If database operation fails (non-duplicate error)
+            DatabaseError: If database operation fails
         """
-        insert_sql = """
-        INSERT INTO grail_files (
-            ticker, asset_type, file_path,
-            file_created_at, file_modified_at, json_content
-        ) VALUES (%s, %s, %s, %s, %s, %s)
-        """
-
         try:
+            # Check if this exact content already exists
+            self.cursor.execute(
+                "SELECT file_path FROM grail_files WHERE content_hash = %s",
+                (content_hash,)
+            )
+            existing_content = self.cursor.fetchone()
+
+            if existing_content:
+                # Exact same content already exists
+                return 'duplicate'
+
+            # Check if this file path already exists (with different content)
+            self.cursor.execute(
+                "SELECT id FROM grail_files WHERE file_path = %s",
+                (file_path,)
+            )
+            existing_path = self.cursor.fetchone()
+
+            if existing_path:
+                # Update existing record with new content
+                update_sql = """
+                UPDATE grail_files
+                SET ticker = %s,
+                    asset_type = %s,
+                    content_hash = %s,
+                    file_created_at = %s,
+                    file_modified_at = %s,
+                    json_content = %s,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE file_path = %s
+                """
+                self.cursor.execute(
+                    update_sql,
+                    (ticker, asset_type, content_hash, file_created_at,
+                     file_modified_at, json_content, file_path)
+                )
+                self.conn.commit()
+                return 'updated'
+
+            # Insert new record
+            insert_sql = """
+            INSERT INTO grail_files (
+                ticker, asset_type, file_path, content_hash,
+                file_created_at, file_modified_at, json_content
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """
             self.cursor.execute(
                 insert_sql,
-                (ticker, asset_type, file_path, file_created_at, file_modified_at, json_content)
+                (ticker, asset_type, file_path, content_hash,
+                 file_created_at, file_modified_at, json_content)
             )
             self.conn.commit()
-            return True
-
-        except psycopg2.IntegrityError as e:
-            # Duplicate file_path (UNIQUE constraint violation)
-            self.conn.rollback()
-            if 'unique constraint' in str(e).lower():
-                return False
-            raise DatabaseError(f"Database integrity error: {e}")
+            return 'inserted'
 
         except psycopg2.Error as e:
             self.conn.rollback()
-            raise DatabaseError(f"Failed to insert file: {e}")
+            raise DatabaseError(f"Failed to insert/update file: {e}")
 
     def get_file_count(self) -> int:
         """Get total number of files in database."""
