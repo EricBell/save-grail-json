@@ -141,31 +141,37 @@ class GrailDatabase:
                 # Column doesn't exist, add it (for existing installations)
                 import hashlib
 
-                # Add columns
+                # Add columns without constraints first
                 self.cursor.execute("""
                     ALTER TABLE grail_files
                     ADD COLUMN IF NOT EXISTS content_hash VARCHAR(64),
                     ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 """)
+                self.conn.commit()
 
                 # Compute hashes for existing records
-                self.cursor.execute("SELECT id, json_content FROM grail_files WHERE content_hash IS NULL")
-                for row_id, json_content in self.cursor.fetchall():
+                self.cursor.execute("SELECT id, json_content FROM grail_files")
+                rows = self.cursor.fetchall()
+
+                for row_id, json_content in rows:
                     content_hash = hashlib.sha256(json_content.encode('utf-8')).hexdigest()
                     self.cursor.execute(
                         "UPDATE grail_files SET content_hash = %s WHERE id = %s",
                         (content_hash, row_id)
                     )
+                self.conn.commit()
 
                 # Now add constraints
                 self.cursor.execute("""
                     ALTER TABLE grail_files
-                    ALTER COLUMN content_hash SET NOT NULL,
+                    ALTER COLUMN content_hash SET NOT NULL
+                """)
+                self.cursor.execute("""
+                    ALTER TABLE grail_files
                     ADD CONSTRAINT grail_files_content_hash_key UNIQUE (content_hash)
                 """)
-
                 self.conn.commit()
-        except psycopg2.Error:
+        except psycopg2.Error as e:
             # If migration fails, it's likely already done or table is new
             self.conn.rollback()
 
