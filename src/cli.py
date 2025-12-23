@@ -20,6 +20,11 @@ from src.ingestion import ingest_json_file, IngestionError
     help='Launch interactive TUI file browser'
 )
 @click.option(
+    '--tui-path',
+    type=click.Path(exists=True, file_okay=False, dir_okay=True),
+    help='Starting directory for TUI mode (default: current directory)'
+)
+@click.option(
     '--config',
     type=click.Path(exists=True),
     help='Path to database configuration file (overrides default)'
@@ -29,7 +34,7 @@ from src.ingestion import ingest_json_file, IngestionError
     help='Database name (overrides config file setting)'
 )
 @click.version_option(version='0.1.0', prog_name='save-grail-json')
-def main(files: tuple, tui: bool, config: str, database: str):
+def main(files: tuple, tui: bool, tui_path: str, config: str, database: str):
     """
     Save grail JSON files to PostgreSQL database for later review and analysis.
 
@@ -38,11 +43,12 @@ def main(files: tuple, tui: bool, config: str, database: str):
         save-grail-json file1.json file2.json
         save-grail-json data/*.json
         save-grail-json --tui
+        save-grail-json --tui --tui-path /path/to/start
         save-grail-json --config /path/to/config.toml file.json
     """
     # Check for TUI mode
     if tui:
-        launch_tui(config, database)
+        launch_tui(config, database, tui_path)
         return
 
     # CLI mode requires files
@@ -127,13 +133,14 @@ def process_files(file_paths: List[str], db_config: DatabaseConfig, database_nam
         sys.exit(1)
 
 
-def launch_tui(config_path: str = None, database_name: str = None):
+def launch_tui(config_path: str = None, database_name: str = None, start_path: str = None):
     """
     Launch the interactive TUI file browser.
 
     Args:
         config_path: Optional config file path
         database_name: Optional database name override
+        start_path: Optional starting directory for TUI
     """
     try:
         from src.tui import GrailFileBrowser
@@ -150,7 +157,7 @@ def launch_tui(config_path: str = None, database_name: str = None):
         sys.exit(1)
 
     # Launch TUI
-    app = GrailFileBrowser(db_config, database_name)
+    app = GrailFileBrowser(db_config, database_name, start_path)
     app.run()
 
 

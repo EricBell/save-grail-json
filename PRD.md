@@ -69,18 +69,33 @@ save-grail-json data/*.json
 - **FR-3.2:** The TUI shall display the current directory and its contents
 - **FR-3.3:** The TUI shall allow navigation up to parent directories
 - **FR-3.4:** The TUI shall allow navigation down into subdirectories
-- **FR-3.5:** The TUI shall highlight JSON files for selection
-- **FR-3.6:** The TUI shall allow single or multiple file selection
-- **FR-3.7:** The TUI shall start from the current working directory or a specified path
-- **FR-3.8:** The TUI shall provide a visual indicator of selected files
-- **FR-3.9:** The TUI shall provide an action to ingest all selected files
-- **FR-3.10:** The TUI shall display ingestion progress and results
+- **FR-3.5:** The TUI shall provide multiple navigation methods:
+  - Arrow keys for tree navigation
+  - Path input field to jump to any directory
+  - Keyboard shortcut 'h' to jump to home directory
+  - Keyboard shortcut 'r' to jump to root directory (/)
+- **FR-3.6:** The TUI shall highlight JSON files for selection
+- **FR-3.7:** The TUI shall allow single or multiple file selection
+- **FR-3.8:** The TUI shall start from the current working directory or a specified path
+- **FR-3.9:** The TUI shall provide a visual indicator of selected files
+- **FR-3.10:** The TUI shall provide an action to ingest all selected files
+- **FR-3.11:** The TUI shall display ingestion progress and results
 
 **Example Usage:**
 ```bash
 save-grail-json --tui
-save-grail-json --tui /path/to/start/directory
+save-grail-json --tui --tui-path /path/to/start/directory
 ```
+
+**TUI Navigation:**
+- ↑/↓ Arrow keys: Navigate files and directories
+- Enter: Expand/collapse directories
+- Space: Select/deselect JSON files
+- Path input: Type path and press Enter to jump to directory
+- h: Jump to home directory
+- r: Jump to root directory (/)
+- i: Ingest selected files
+- q: Quit
 
 ### 4.4 Configuration Management
 
@@ -332,17 +347,22 @@ Successfully ingested 2 file(s), 1 error(s)
 
 ```
 ┌─ save-grail-json File Browser ────────────────────────────────────┐
-│ Current: /home/user/trading-data/                                 │
+│ ↑/↓: Navigate | Enter: Expand/collapse | Space: Select JSON      │
+│ i: Ingest | h: Home | r: Root | q: Quit                          │
 ├───────────────────────────────────────────────────────────────────┤
-│ [↑] ..                                                            │
-│ [ ] 📁 2024-01/                                                   │
-│ [ ] 📁 2024-02/                                                   │
-│ [✓] 📄 FENI.json                                                  │
-│ [✓] 📄 AAPL.json                                                  │
-│ [ ] 📄 TSLA.json                                                  │
-│ [ ] 📄 notes.txt                                                  │
+│ Path: /home/user/trading-data/                                    │
 ├───────────────────────────────────────────────────────────────────┤
-│ Selected: 2 files | [I]ngest [Q]uit [Space] Select [Enter] Open  │
+│ ▼ 📁 trading-data                                                 │
+│   ▼ 📁 2024-01                                                    │
+│     ✓ 📄 FENI.json                                                │
+│   ▼ 📁 2024-02                                                    │
+│     ✓ 📄 AAPL.json                                                │
+│     ☐ 📄 TSLA.json                                                │
+│     ☐ 📄 notes.txt                                                │
+├───────────────────────────────────────────────────────────────────┤
+│ [Ingest Selected (i)] [Home (h)] [Root (r)] [Quit (q)]           │
+├───────────────────────────────────────────────────────────────────┤
+│ Selected: 2 files                                                 │
 └───────────────────────────────────────────────────────────────────┘
 ```
 
@@ -397,3 +417,4 @@ save-grail-json file.json
 | 1.0 | 2025-12-23 | Eric Bell / Claude | Initial PRD |
 | 1.1 | 2025-12-23 | Eric Bell / Claude | Added PostgreSQL configuration |
 | 1.2 | 2025-12-23 | Eric Bell / Claude | Changed config to `~/.config/postgres/save-grail-json.toml` (app-specific pattern) |
+| 1.3 | 2025-12-23 | Eric Bell / Claude | Enhanced TUI navigation (path input, home/root shortcuts, --tui-path option) |

@@ -62,6 +62,9 @@ python -m src.cli data/*.json
 # TUI mode - interactive file browser
 python -m src.cli --tui
 
+# TUI mode with specific starting directory
+python -m src.cli --tui --tui-path /path/to/start
+
 # Custom config file
 python -m src.cli --config /path/to/config.toml file.json
 
@@ -71,6 +74,7 @@ python -m src.cli --database my_database file.json
 # After installation via pip install -e .
 save-grail-json file1.json
 save-grail-json --tui
+save-grail-json --tui --tui-path /home/user/data
 ```
 
 ### Testing
@@ -122,6 +126,12 @@ mypy src/
   - Gets file creation/modification timestamps
 - `src/tui.py` - Interactive file browser using Textual
   - `GrailFileBrowser` app with directory tree navigation
+  - Navigation features:
+    - Arrow keys (↑/↓) to navigate files and directories
+    - Enter to expand/collapse directories
+    - Path input field to jump to any directory
+    - 'h' key or button to jump to home directory
+    - 'r' key or button to jump to root directory (/)
   - Space to select/deselect JSON files
   - 'i' key or button to ingest selected files
   - Real-time status updates and error handling
