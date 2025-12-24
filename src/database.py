@@ -107,7 +107,7 @@ class GrailDatabase:
             content_hash VARCHAR(64) NOT NULL UNIQUE,
             file_created_at TIMESTAMP,
             file_modified_at TIMESTAMP,
-            json_content TEXT NOT NULL,
+            json_content JSONB NOT NULL,
             ingested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
@@ -119,6 +119,9 @@ class GrailDatabase:
 
             # Add content_hash column to existing tables (migration)
             self._migrate_add_content_hash()
+
+            # Migrate json_content from TEXT to JSONB if needed
+            self._migrate_text_to_jsonb()
 
             # Create indexes (safe to run after migration)
             index_sql = """
@@ -187,6 +190,36 @@ class GrailDatabase:
 
         except psycopg2.Error as e:
             # If migration fails, rollback and re-raise
+            self.conn.rollback()
+            # Don't raise - let the caller handle it
+            pass
+
+    def _migrate_text_to_jsonb(self):
+        """Migrate json_content column from TEXT to JSONB if needed."""
+        try:
+            # Check current data type of json_content column
+            self.cursor.execute("""
+                SELECT data_type
+                FROM information_schema.columns
+                WHERE table_name='grail_files' AND column_name='json_content'
+            """)
+            result = self.cursor.fetchone()
+
+            # If column doesn't exist or is already JSONB, nothing to do
+            if not result or result[0] == 'jsonb':
+                return
+
+            # Column exists and is TEXT, convert to JSONB
+            if result[0] == 'text':
+                # Use USING clause to convert TEXT to JSONB
+                self.cursor.execute("""
+                    ALTER TABLE grail_files
+                    ALTER COLUMN json_content TYPE JSONB USING json_content::JSONB
+                """)
+                self.conn.commit()
+
+        except psycopg2.Error as e:
+            # If migration fails, rollback but don't raise
             self.conn.rollback()
             # Don't raise - let the caller handle it
             pass
