@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import List
 import click
 
+from src import __version__
 from src.config import DatabaseConfig, ConfigError
 from src.database import GrailDatabase, DatabaseError
 from src.ingestion import ingest_json_file, IngestionError
@@ -28,7 +29,7 @@ from src.ingestion import ingest_json_file, IngestionError
     '--database',
     help='Database name (overrides config file setting)'
 )
-@click.version_option(version='0.1.0', prog_name='save-grail-json')
+@click.version_option(version=__version__, prog_name='save-grail-json')
 def main(files: tuple, tui: bool, config: str, database: str):
     """
     Save grail JSON files to PostgreSQL database for later review and analysis.
