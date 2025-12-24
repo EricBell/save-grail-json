@@ -99,6 +99,65 @@ save-grail-json --tui
 - **FR-4.6:** The system shall create the target database if it doesn't exist (with appropriate permissions)
 - **FR-4.7:** The system shall create the required table schema on first run if it doesn't exist
 
+### 4.5 Version Management
+
+- **FR-5.1:** The system shall maintain version information in `pyproject.toml` as the single source of truth
+- **FR-5.2:** The system shall sync version information to `src/__init__.py` for runtime access
+- **FR-5.3:** The system shall support manual version increment commands (major, minor, patch)
+- **FR-5.4:** The system shall automatically increment patch version when tracked files change
+- **FR-5.5:** The system shall use git pre-commit hooks to detect file changes and update version
+- **FR-5.6:** The system shall track file hashes to detect changes in source files
+- **FR-5.7:** The system shall display version via `--version` CLI flag
+- **FR-5.8:** The system shall include version in installed package metadata
+
+**Version Management Commands:**
+```bash
+# Check current version
+python version_manager.py status
+# Output: Current version: v0.2.0
+
+# Manually increment patch version (0.2.0 → 0.2.1)
+python version_manager.py patch
+
+# Manually increment minor version (0.2.1 → 0.3.0)
+python version_manager.py minor
+
+# Manually increment major version (0.3.0 → 1.0.0)
+python version_manager.py major
+
+# Reset to specific version
+python version_manager.py reset 1 0 0
+
+# Check for changes and auto-increment if needed
+python version_manager.py check
+```
+
+**Version Display:**
+```bash
+# Display installed version
+save-grail-json --version
+# Output: save-grail-json, version 0.2.0
+
+# Display version with uv
+uv run save-grail-json --version
+```
+
+**Git Hook Installation:**
+```bash
+# Install pre-commit hook for automatic version incrementing
+./install-hooks.sh
+# Output: Pre-commit hook installed at .git/hooks/pre-commit
+```
+
+**Automatic Versioning Workflow:**
+1. Developer modifies source files in `src/**/*.py` or `pyproject.toml`
+2. Developer commits changes: `git add . && git commit -m "message"`
+3. Pre-commit hook runs `version_manager.py check`
+4. If tracked files changed, patch version increments (e.g., 0.2.0 → 0.2.1)
+5. Both `pyproject.toml` and `src/__init__.py` are updated
+6. Updated version files are automatically staged in the commit
+7. Commit proceeds with version bump included
+
 ## 5. Data Model
 
 ### 5.1 Database Schema
@@ -113,15 +172,18 @@ save-grail-json --tui
 | ticker | VARCHAR(20) | Stock/asset ticker symbol | NULLABLE |
 | asset_type | VARCHAR(50) | Type of asset (STOCK, etc.) | NULLABLE |
 | file_path | TEXT | Original file path | NOT NULL, UNIQUE |
+| content_hash | VARCHAR(64) | SHA256 hash of JSON content | NOT NULL, UNIQUE |
 | file_created_at | TIMESTAMP | File creation timestamp | NULLABLE |
 | file_modified_at | TIMESTAMP | File modification timestamp | NULLABLE |
-| json_content | TEXT | Complete JSON file as text | NOT NULL |
+| json_content | JSONB | Complete JSON file in binary format | NOT NULL |
 | ingested_at | TIMESTAMP | When record was added to DB | DEFAULT CURRENT_TIMESTAMP |
+| updated_at | TIMESTAMP | When record was last updated | DEFAULT CURRENT_TIMESTAMP |
 
 **Indexes:**
 - `idx_ticker` on `ticker` for faster searching
 - `idx_asset_type` on `asset_type` for filtering
 - `idx_ingested_at` on `ingested_at` for chronological queries
+- `idx_content_hash` on `content_hash` for duplicate detection
 
 **Schema Creation SQL:**
 ```sql
@@ -130,16 +192,24 @@ CREATE TABLE IF NOT EXISTS grail_files (
     ticker VARCHAR(20),
     asset_type VARCHAR(50),
     file_path TEXT NOT NULL UNIQUE,
+    content_hash VARCHAR(64) NOT NULL UNIQUE,
     file_created_at TIMESTAMP,
     file_modified_at TIMESTAMP,
-    json_content TEXT NOT NULL,
-    ingested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    json_content JSONB NOT NULL,
+    ingested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_ticker ON grail_files(ticker);
 CREATE INDEX IF NOT EXISTS idx_asset_type ON grail_files(asset_type);
 CREATE INDEX IF NOT EXISTS idx_ingested_at ON grail_files(ingested_at);
+CREATE INDEX IF NOT EXISTS idx_content_hash ON grail_files(content_hash);
 ```
+
+**Key Schema Features:**
+- **JSONB data type**: Enables efficient JSON querying, indexing, and validation
+- **content_hash**: SHA256 hash for duplicate content detection (different from file_path)
+- **updated_at**: Tracks when existing records are updated with new content
 
 ### 5.2 Example JSON Structure
 
@@ -178,29 +248,38 @@ CREATE INDEX IF NOT EXISTS idx_ingested_at ON grail_files(ingested_at);
 
 - `textual` - for TUI implementation
 - `psycopg2-binary` or `psycopg` - PostgreSQL database driver
-- `tomli` (Python < 3.11) or `tomllib` (Python 3.11+) - TOML parsing
-- Standard library modules: `json`, `argparse`, `pathlib`, `datetime`, `os`
+- `tomli` (Python < 3.11) or `tomllib` (Python 3.11+) - TOML parsing (read-only)
+- `tomlkit` - TOML parsing with write support (preserves formatting)
+- `click` - CLI framework with version option support
+- Standard library modules: `json`, `pathlib`, `datetime`, `os`, `hashlib`, `re`
 
 ### 6.3 File Structure
 
 ```
 save-grail-json/
 ├── src/
-│   ├── __init__.py
-│   ├── cli.py           # CLI argument parsing and main entry point
-│   ├── config.py        # Configuration loading from TOML
-│   ├── database.py      # Database operations (PostgreSQL)
-│   ├── ingestion.py     # JSON file reading and processing
-│   └── tui.py           # TUI implementation with Textual
+│   ├── __init__.py          # Package init, exports __version__
+│   ├── cli.py               # CLI argument parsing and main entry point
+│   ├── config.py            # Configuration loading from TOML
+│   ├── database.py          # Database operations (PostgreSQL)
+│   ├── ingestion.py         # JSON file reading and processing
+│   └── tui.py               # TUI implementation with Textual
 ├── tests/
 │   ├── test_ingestion.py
 │   ├── test_database.py
 │   ├── test_config.py
 │   └── test_cli.py
-├── requirements.txt
-├── setup.py or pyproject.toml
-├── PRD.md               # This document
-├── CLAUDE.md            # Developer guidance
+├── .git/
+│   └── hooks/
+│       └── pre-commit       # Git pre-commit hook for version auto-increment
+├── version_manager.py       # Version management CLI and automation
+├── install-hooks.sh         # Script to install git hooks
+├── .version_hashes.json     # File hashes for change detection (gitignored)
+├── .gitignore              # Git ignore patterns
+├── pyproject.toml          # Project metadata and dependencies (source of version)
+├── uv.lock                 # UV lockfile for reproducible installs
+├── PRD.md                  # This document
+├── CLAUDE.md               # Developer guidance
 ├── README.md
 └── LICENSE
 ```
@@ -408,3 +487,4 @@ save-grail-json file.json
 | 1.1 | 2025-12-23 | Eric Bell / Claude | Added PostgreSQL configuration |
 | 1.2 | 2025-12-23 | Eric Bell / Claude | Changed config to `~/.config/postgres/save-grail-json.toml` (app-specific pattern) |
 | 1.3 | 2025-12-23 | Eric Bell / Claude | Added TUI parent directory navigation ('u' key) |
+| 1.4 | 2025-12-23 | Eric Bell / Claude | Added version management system (FR-5.1 through FR-5.8), version_manager.py, git hooks, updated dependencies and file structure |
