@@ -1,0 +1,256 @@
+{
+  "status": "success",
+  "ticker": "MNQ",
+  "requested_ticker": null,
+  "resolved_ticker": null,
+  "resolved_ticker_method": null,
+  "asset_type": "STOCK",
+  "trade_style": "DAY",
+  "account_size": 2000,
+  "risk_percent": 1,
+  "agent_verdicts": {
+    "technical": {
+      "direction": "neutral",
+      "confidence": 0,
+      "entry_type": "other",
+      "support_levels": {
+        "minor": [],
+        "major": [],
+        "key_references": {
+          "pdc": 0,
+          "pdl": 0,
+          "opening_range_low": 0,
+          "weekly_low": 0,
+          "monthly_low": 0
+        }
+      },
+      "resistance_levels": {
+        "minor": [],
+        "major": [],
+        "key_references": {
+          "pdh": 0,
+          "opening_range_high": 0,
+          "weekly_high": 0,
+          "monthly_high": 0
+        }
+      },
+      "chart_patterns": [],
+      "mtf_alignment": "conflicting",
+      "volatility": "normal",
+      "options_flow": "unavailable",
+      "reasoning": [
+        "CRITICAL DATA FAILURE: No price snapshot, historical bars, or session data provided for MNQ. Analysis is impossible.",
+        "Mike's Methodology requires, at minimum, price action (High/Low/Close) to determine support/resistance levels.",
+        "Volatility regime cannot be calculated without intraday range vs ATR data.",
+        "Recommendation: Please provide session data (Open, High, Low, Close) or recent bar history to enable technical analysis."
+      ]
+    },
+    "macro": {
+      "market_regime": "risk_on",
+      "confidence": 50,
+      "spy_direction": "flat",
+      "qqq_direction": "flat",
+      "cross_asset_alignment": "mixed",
+      "intermarket_divergence": "in_sync",
+      "session_context": {
+        "type": "pre_market",
+        "risk_note": "US Overnight session active; liquidity may be lower than regular hours. US Cash market data currently unavailable."
+      },
+      "economic_assessment": {
+        "inflation_trend": "unknown",
+        "fed_stance_implied": "unknown",
+        "yield_curve_signal": "unknown",
+        "macro_headwinds": [
+          "Data staleness (CPI 55 days old)",
+          "Lack of immediate catalyst visibility"
+        ],
+        "macro_tailwinds": [
+          "Asian market strength (Nikkei +0.94%) suggesting positive global risk sentiment"
+        ]
+      },
+      "news_sentiment": {
+        "overall": "neutral",
+        "key_themes": [],
+        "major_concerns": []
+      },
+      "international_assessment": {
+        "asia_sentiment": "bullish",
+        "europe_sentiment": "unavailable",
+        "gap_bias": "gap_up",
+        "relevance": "high"
+      },
+      "reasoning": [
+        "Factor 1: Strong performance in Asia (Nikkei +0.94%) signals overnight risk-on appetite, which typically supports US Tech Futures (MNQ).",
+        "Factor 2: Hang Seng is positive (flat change), providing stability rather than drag.",
+        "Factor 3: US Cash data (SPY/QQQ) is flat/zero, confirming an overnight/pre-market environment where international sentiment is the primary driver.",
+        "Factor 4: Lack of immediate negative news or fresh economic data headwinds allows the international momentum to carry the session bias.",
+        "Factor 5: Technical gap-up potential is likely for US Open if European markets follow Asia's lead later in the morning."
+      ]
+    },
+    "wild_card": {
+      "wild_cards_identified": [
+        {
+          "type": "liquidity",
+          "description": "Holiday Week 'Skeleton Crew' Conditions (Post-Christmas/Pre-New Year)",
+          "probability": "high",
+          "impact": "moderate",
+          "mitigation": "Reduce position size by 50%; Use LIMIT orders strictly (avoid market orders due to wide spreads)."
+        },
+        {
+          "type": "systemic",
+          "description": "Low-Volume Volatility Spikes ('Air Pockets')",
+          "probability": "medium",
+          "impact": "severe",
+          "mitigation": "Widen stop loss slightly to account for noise, but enforce hard max loss; Do not chase breakout candles that lack institutional volume backup."
+        },
+        {
+          "type": "timing",
+          "description": "Friday Post-Holiday Session Decay",
+          "probability": "high",
+          "impact": "minor",
+          "mitigation": "Treat the entire Friday afternoon (post 12:00 PM ET) as a 'no fly zone'. Institutional liquidity often vanishes early ahead of the weekend."
+        },
+        {
+          "type": "external_event",
+          "description": "Geopolitical Headline Sensitivity",
+          "probability": "low",
+          "impact": "severe",
+          "mitigation": "In thin markets, minor headlines cause outsized reactions. Monitor news feeds for sudden spikes; automatic flat if VIX spikes >5% intraday."
+        },
+        {
+          "type": "execution",
+          "description": "Overnight/Asian Session Bid-Ask Spread Widening",
+          "probability": "medium",
+          "impact": "minor",
+          "mitigation": "verify spread on DOM (Depth of Market) before entry; if spread > 2 ticks on MNQ, stand aside."
+        }
+      ],
+      "overall_risk_assessment": "moderate",
+      "recommended_contingencies": [
+        "Contingency 1: If volume is <70% of average 30-day volume at open, switch to scalp-only mode (taking quick profits, not holding for trends).",
+        "Contingency 2: If a sudden 50+ point drop occurs without news (flash crash symptom), do NOT buy the dip immediately; wait for 15-minute stabilization.",
+        "Contingency 3: Hard stop trading time set for 11:30 AM ET or 12:00 PM ET if price action becomes choppy/range-bound."
+      ],
+      "timing_considerations": [
+        "Thursday Overnight: Thin volume, prone to algo stop-runs.",
+        "Friday Open (9:30 AM ET): Potential Gap Up based on Nikkei, but fade risk is high.",
+        "Friday Afternoon: Extreme illiquidity expected; avoid holding positions."
+      ],
+      "honest_uncertainty": "We cannot predict if a large institution decides to rebalance a portfolio EOY (End of Year) on low volume, which would move the market significantly against the technical trend without warning."
+    }
+  },
+  "trade_plan": {
+    "trade": false,
+    "verdict": {
+      "action": "NO TRADE",
+      "confidence": "0% confidence - Data Unavailable",
+      "reasoning": [
+        "CRITICAL TECHNICAL FAILURE: The Technical Agent reports a complete lack of price data (snapshot, session data, or historical bars) for MNQ.",
+        "Methodology Constraint: Mike's trading methodology requires defining risk based on support/resistance levels ('how much to lose if wrong'). Without current price or structure, these levels cannot be defined.",
+        "Macro Context: While Macro sentiment is 'Risk-On' (Bullish) due to Asian market strength, trading on macro sentiment alone without technical execution triggers is gambling, not trading.",
+        "Holiday Risk: Compounding the data issue is the 'Skeleton Crew' liquidity warning for the post-Christmas Friday session, which dramatically increases the risk of 'air pockets' and wide spreads."
+      ]
+    },
+    "synthesis": {
+      "technical_confidence": 0,
+      "macro_confidence": 50,
+      "wild_card_risk": "high",
+      "agent_agreement": "conflict",
+      "conflict_resolution": "Technical Agent's inability to provide levels prevents trade generation regardless of Macro sentiment. Defaulting to Safety/No Trade."
+    },
+    "entry": {
+      "direction": "LONG",
+      "recommendation": "wait_for_data",
+      "ideal_zone": {
+        "low": 0,
+        "mid": 0,
+        "high": 0,
+        "confidence": "N/A"
+      },
+      "current_price": 0,
+      "wait_for": "Price data availability and market open to define Opening Range."
+    },
+    "position": {
+      "size_recommendation": "quarter",
+      "rationale": "If trading were possible, size would be reduced due to holiday illiquidity.",
+      "quantity": 0,
+      "unit_type": "contracts",
+      "total_cost": "$0",
+      "max_risk": "$0"
+    },
+    "exits": {
+      "stop_loss": {
+        "price_range": [
+          0,
+          0
+        ],
+        "total_loss": "$0",
+        "rationale": "Cannot determine structure-based stop without price history."
+      },
+      "profit_targets": [],
+      "time_stop": {
+        "date_or_duration": "N/A",
+        "rationale": "N/A"
+      }
+    },
+    "wild_cards": {
+      "identified_risks": [
+        {
+          "risk": "Missing Price Data",
+          "probability": "high",
+          "impact": "severe",
+          "contingency": "Do not execute until data feed is restored."
+        },
+        {
+          "risk": "Holiday Liquidity (Skeleton Crew)",
+          "probability": "high",
+          "impact": "moderate",
+          "contingency": "Reduce position size by 50% if trading resumes; use LIMIT orders only."
+        },
+        {
+          "risk": "Friday Post-Holiday Decay",
+          "probability": "high",
+          "impact": "minor",
+          "contingency": "Avoid holding positions into Friday afternoon (post 12:00 PM ET)."
+        }
+      ],
+      "manual_checks_required": [
+        "[!] Verify data feed connection for MNQ",
+        "[!] Check Open price at 9:30 AM ET Friday Dec 26",
+        "[!] Monitor spread width (Do not trade if > 2 ticks)"
+      ],
+      "honest_uncertainty": "We have absolutely no visibility on where MNQ is currently trading relative to its weekly or monthly ranges due to the data blackout."
+    },
+    "execution_plan": {
+      "step_1": "Wait for Markets to Open (Friday Dec 26, 9:30 AM ET) AND for price data to populate.",
+      "step_2": "Establish the Opening Range (first 30 minutes of trade).",
+      "step_3": "IF price breaks above the Opening Range High with volume -> Look for pullback to retest the High as support to go LONG.",
+      "step_4": "IF price stays within range on low volume -> Stay Flat (Holiday chop)."
+    },
+    "no_trade_reason": "CRITICAL SYSTEM ERROR: Missing price data prevents technical analysis."
+  },
+  "pre_trade_checks": {
+    "safe_to_trade": true,
+    "warnings": [
+      "[!] MANUAL CHECK REQUIRED: Verify economic calendar before trading",
+      "[!] Check for: FOMC, CPI, NFP, GDP releases",
+      "[!] Check for: Earnings if trading stocks/options"
+    ],
+    "critical_events": [],
+    "news_summary": "Automated news scraping disabled - check forexfactory.com/calendar manually",
+    "earnings_upcoming": false,
+    "major_events": [],
+    "manual_check_required": true
+  },
+  "error": null,
+  "runs_remaining": 175,
+  "in_trial": true,
+  "daily_runs_remaining": 47,
+  "market_session": {
+    "status": "closed",
+    "is_tradeable_now": false,
+    "next_market_open": "2025-12-26T09:30:00-05:00",
+    "timing_note": "MARKETS CLOSED - Christmas Day Opens Friday (Dec 26) 9:30 AM ET.",
+    "asset_type": "STOCK"
+  }
+}

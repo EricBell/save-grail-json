@@ -1,0 +1,272 @@
+{
+  "status": "success",
+  "ticker": "MES",
+  "requested_ticker": "MES",
+  "resolved_ticker": "MESH6",
+  "resolved_ticker_method": "most_active_volume",
+  "asset_type": "FUTURES",
+  "trade_style": "DAY",
+  "account_size": 2000,
+  "risk_percent": 1,
+  "agent_verdicts": {
+    "technical": {
+      "direction": "long",
+      "confidence": 45,
+      "entry_type": "support_bounce",
+      "support_levels": {
+        "minor": [
+          6976.5
+        ],
+        "major": [
+          6974
+        ],
+        "key_references": {
+          "pdc": 6982.5,
+          "pdl": 6974,
+          "opening_range_low": 6974,
+          "weekly_low": 6974,
+          "monthly_low": 6974
+        }
+      },
+      "resistance_levels": {
+        "minor": [
+          6984.5,
+          6990
+        ],
+        "major": [
+          6995
+        ],
+        "key_references": {
+          "pdh": 6995,
+          "opening_range_high": 6995,
+          "weekly_high": 6995,
+          "monthly_high": 6995
+        }
+      },
+      "chart_patterns": [
+        "Potential Double Bottom w/ Day Low"
+      ],
+      "mtf_alignment": "mixed",
+      "volatility": "low",
+      "options_flow": "unavailable",
+      "reasoning": [
+        "Factor 1: Price Action Context - Price (6976.5) is trading immediately above the Session Low (6974). Per Mike's methodology, we execute entries at Support, never shorting into it.",
+        "Factor 2: Risk/Reward - Entering long here offers a defined risk (stop below 6974) with a target of mean reversion to the day's midpoint (~6985), providing a favorable >3:1 R/R ratio.",
+        "Factor 3: Volatility Compression - The daily range is only ~21 points (0.3%), suggesting a compressed 'low volatility' regime. These environments often favor mean reversion scalps from the range edges rather than trend continuations.",
+        "Factor 4: Historical Data Limitation - Analysis is based purely on snapshot session levels (High/Low) as historical bars are unavailable. Confidence is capped at 45% due to lack of trend context."
+      ]
+    },
+    "macro": {
+      "market_regime": "neutral",
+      "confidence": 65,
+      "spy_direction": "flat",
+      "qqq_direction": "flat",
+      "cross_asset_alignment": "mixed",
+      "intermarket_divergence": "in_sync",
+      "session_context": {
+        "type": "pre_market",
+        "risk_note": "Likely holiday/low-liquidity environment (inferred late Dec 2025 date); expect thin order books."
+      },
+      "economic_assessment": {
+        "inflation_trend": "unknown",
+        "fed_stance_implied": "unknown",
+        "yield_curve_signal": "unknown",
+        "macro_headwinds": [
+          "Stale economic data limits visibility",
+          "Potential holiday season liquidity drain"
+        ],
+        "macro_tailwinds": [
+          "Asian market strength (Nikkei +0.68%) provides mild positive backdrop"
+        ]
+      },
+      "news_sentiment": {
+        "overall": "neutral",
+        "key_themes": [],
+        "major_concerns": []
+      },
+      "international_assessment": {
+        "asia_sentiment": "bullish",
+        "europe_sentiment": "neutral",
+        "gap_bias": "flat",
+        "relevance": "medium"
+      },
+      "reasoning": [
+        "U.S. Futures (SPY/QQQ) are showing virtually zero movement (-0.06% and +0.003%), indicating a holding pattern or low liquidity environment.",
+        "International signals are moderately positive with Nikkei up 0.68%, but Europe is effectively flat, suggesting no strong global directional impulse.",
+        "Economic data is significantly stale (55 days old), meaning current price action is likely driven by flows and positioning rather than macro fundamentals.",
+        "The divergence between Tech (QQQ green) and Broad Market (SPY red) is negligible, confirming a Neutral/chop regime.",
+        "Absence of breaking news and stale macro data suggests a range-bound open for MES."
+      ]
+    },
+    "wild_card": {
+      "wild_cards_identified": [
+        {
+          "type": "external_event",
+          "description": "Unscheduled Friday Geopolitics/News Dump",
+          "probability": "low",
+          "impact": "severe",
+          "mitigation": "Hard stops must be working in the order book (server-side), not mental stops."
+        },
+        {
+          "type": "timing",
+          "description": "Friday Afternoon Liquidity Drain / Profit Taking",
+          "probability": "high",
+          "impact": "moderate",
+          "mitigation": "Stop trading or tighten stops significantly after 2:00 PM ET as institutions square books for the weekend."
+        },
+        {
+          "type": "liquidity",
+          "description": "Pre-Market 'Head Fake' (6:51 AM - 9:30 AM ET)",
+          "probability": "medium",
+          "impact": "moderate",
+          "mitigation": "Do not treat pre-market price action as confirmed trend until RTH (Regular Trading Hours) volume validates it."
+        },
+        {
+          "type": "systemic",
+          "description": "Futures Market-On-Close (MOC) Imbalance Volatility",
+          "probability": "high",
+          "impact": "moderate",
+          "mitigation": "Close all day positions by 3:50 PM ET to avoid the final 10-minute institutional rebalancing whip-saw."
+        }
+      ],
+      "overall_risk_assessment": "moderate",
+      "recommended_contingencies": [
+        "Contingency 1: If news breaks causing a >10 point spike against position, execute 'Flatten All' immediately; do not wait for a retrace.",
+        "Contingency 2: If RTH Open (9:30 AM) reverses pre-market trend immediately, exit position; do not hold hoping for pre-market levels to return.",
+        "Contingency 3: If holding into 12:00 PM ET, move stops to breakeven or close out to avoid Lunch Hour chop."
+      ],
+      "timing_considerations": [
+        "Pre-market (Now - 9:30 AM): Thin liquidity, susceptible to manipulation.",
+        "Lunch Hour (12:00 PM - 1:00 PM ET): Volume drops, increased probability of 'chop' and stop-hunting.",
+        "Friday Close (3:45 PM - 4:00 PM ET): Extreme unpredictability due to option expiration pinning and weekend positioning."
+      ],
+      "honest_uncertainty": "We cannot predict if a major entity (hedge fund/institution) decides to liquidate a massive position before the weekend, which would override all technical support levels regarding the bullish international sentiment."
+    }
+  },
+  "trade_plan": {
+    "trade": true,
+    "verdict": {
+      "action": "BUY STOCK",
+      "confidence": "60% confidence - means favorable technical setup at support within a neutral macro environment",
+      "reasoning": [
+        "Technical Agent identifies a high-probability 'support bounce' setup at 6974 (Session Low/Weekly Low).",
+        "Macro Agent reports a 'neutral' regime with flat indices, which favors range-trading strategies (buying support, selling resistance) rather than trend following.",
+        "Mike's Methodology: Buying at major support (6974) rather than chasing a breakout. Risk is clearly defined against the weekly low.",
+        "Risk/Reward is attractive (~3:1) targeting a mean reversion to the daily midpoint."
+      ]
+    },
+    "synthesis": {
+      "technical_confidence": 45,
+      "macro_confidence": 65,
+      "wild_card_risk": "moderate",
+      "agent_agreement": "partial",
+      "conflict_resolution": "Macro is Neutral (not Bearish), while Technical is Bullish at support. In a range-bound market, we default to the Technical Agent's key levels for mean reversion trades."
+    },
+    "entry": {
+      "direction": "LONG",
+      "recommendation": "buy_support_bounce",
+      "ideal_zone": {
+        "low": 6974.5,
+        "mid": 6975.5,
+        "high": 6976.5,
+        "confidence": "65% likely to hold this support zone"
+      },
+      "current_price": 6976.5,
+      "wait_for": "Enter Limit Order in zone 6974.50-6976.50 (Buying the test of support)"
+    },
+    "position": {
+      "size_recommendation": "full",
+      "rationale": "Account size allows for exactly 1 Micro contract to stay within $20 risk limit using a 4-point stop.",
+      "quantity": 1,
+      "unit_type": "contracts",
+      "total_cost": "Margin requirement (broker dependent, approx $50-$100 day trade margin)",
+      "max_risk": "$20.00 (1.0% of account)"
+    },
+    "exits": {
+      "stop_loss": {
+        "price_range": [
+          6971.5,
+          6972
+        ],
+        "total_loss": "$20.00 - $22.50",
+        "rationale": "Placed 2-2.5 points below the critical Support/Weekly Low of 6974 to account for volatility wicks."
+      },
+      "profit_targets": [
+        {
+          "target": 1,
+          "price_range": [
+            6982,
+            6983
+          ],
+          "position_percent": 100,
+          "probability": "60% chance (Previous Day Close)"
+        },
+        {
+          "target": 2,
+          "price_range": [
+            6989,
+            6990
+          ],
+          "position_percent": 0,
+          "probability": "30% chance (Upper Range Resistance - Optional runner if risk tolerence allows)"
+        }
+      ],
+      "time_stop": {
+        "date_or_duration": "Close by 3:50 PM ET",
+        "rationale": "Friday afternoon session; avoid Market-On-Close volatility and weekend holding costs."
+      }
+    },
+    "wild_cards": {
+      "identified_risks": [
+        {
+          "risk": "Friday Liquidity Drain",
+          "probability": "high",
+          "impact": "moderate",
+          "contingency": "Strict 3:50 PM ET exit to avoid erratic spreads."
+        },
+        {
+          "risk": "Pre-market Head Fake",
+          "probability": "medium",
+          "impact": "moderate",
+          "contingency": "If price drops below 6971 with volume, do not re-enter; thesis is invalidated."
+        }
+      ],
+      "manual_checks_required": [
+        "[!] Verify no major geopolitical news before entry (Friday risk)",
+        "[!] Ensure hard stop is active immediately upon entry"
+      ],
+      "honest_uncertainty": "We cannot predict if large institutional flows will choose to liquidate positions ahead of the weekend, potentially smashing through the 6974 support regardless of technical setup."
+    },
+    "execution_plan": {
+      "step_1": "Place Limit Buy Order for 1 MES contract at 6975.50 (mid-point of entry zone).",
+      "step_2": "Immediately attach Stop Loss at 6971.50.",
+      "step_3": "Place Limit Sell (Take Profit) at 6982.50.",
+      "step_4": "If not filled by 11:00 AM ET or if price breaks below 6971 first, cancel order."
+    },
+    "no_trade_reason": null
+  },
+  "pre_trade_checks": {
+    "safe_to_trade": true,
+    "warnings": [
+      "[!] MANUAL CHECK REQUIRED: Verify economic calendar before trading",
+      "[!] Check for: FOMC, CPI, NFP, GDP releases",
+      "[!] Check for: Earnings if trading stocks/options"
+    ],
+    "critical_events": [],
+    "news_summary": "Automated news scraping disabled - check forexfactory.com/calendar manually",
+    "earnings_upcoming": false,
+    "major_events": [],
+    "manual_check_required": true
+  },
+  "error": null,
+  "runs_remaining": null,
+  "in_trial": null,
+  "daily_runs_remaining": null,
+  "market_session": {
+    "status": "open",
+    "is_tradeable_now": true,
+    "next_market_open": null,
+    "timing_note": "Futures session active.",
+    "asset_type": "FUTURES"
+  }
+}

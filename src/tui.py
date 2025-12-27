@@ -182,7 +182,54 @@ class GrailFileBrowser(App):
                             ticker=file_data.ticker,
                             asset_type=file_data.asset_type,
                             file_created_at=file_data.file_created_at,
-                            file_modified_at=file_data.file_modified_at
+                            file_modified_at=file_data.file_modified_at,
+                            # Core fields
+                            status=file_data.status,
+                            error_message=file_data.error_message,
+                            trade_style=file_data.trade_style,
+                            account_size=file_data.account_size,
+                            risk_percent=file_data.risk_percent,
+                            # Trading decision
+                            should_trade=file_data.should_trade,
+                            trade_action=file_data.trade_action,
+                            trade_confidence_text=file_data.trade_confidence_text,
+                            trade_confidence_pct=file_data.trade_confidence_pct,
+                            no_trade_reason=file_data.no_trade_reason,
+                            # Entry fields
+                            entry_direction=file_data.entry_direction,
+                            entry_price=file_data.entry_price,
+                            entry_recommendation=file_data.entry_recommendation,
+                            # Position sizing
+                            position_quantity=file_data.position_quantity,
+                            position_unit_type=file_data.position_unit_type,
+                            position_size_recommendation=file_data.position_size_recommendation,
+                            position_total_cost_text=file_data.position_total_cost_text,
+                            position_max_risk_text=file_data.position_max_risk_text,
+                            # Market context
+                            market_status=file_data.market_status,
+                            is_tradeable_now=file_data.is_tradeable_now,
+                            in_trial=file_data.in_trial,
+                            # API tracking
+                            runs_remaining=file_data.runs_remaining,
+                            daily_runs_remaining=file_data.daily_runs_remaining,
+                            # Ticker resolution
+                            resolved_ticker=file_data.resolved_ticker,
+                            resolved_ticker_method=file_data.resolved_ticker_method,
+                            # Agent confidence
+                            technical_confidence=file_data.technical_confidence,
+                            macro_confidence=file_data.macro_confidence,
+                            wild_card_risk=file_data.wild_card_risk,
+                            agent_agreement=file_data.agent_agreement,
+                            # Options-specific
+                            option_contract_symbol=file_data.option_contract_symbol,
+                            option_type=file_data.option_type,
+                            option_strike=file_data.option_strike,
+                            option_expiration=file_data.option_expiration,
+                            option_days_to_expiry=file_data.option_days_to_expiry,
+                            option_delta=file_data.option_delta,
+                            option_mid_price=file_data.option_mid_price,
+                            option_volume=file_data.option_volume,
+                            option_open_interest=file_data.option_open_interest
                         )
 
                         if result == 'inserted':

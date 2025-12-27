@@ -1,0 +1,278 @@
+{
+  "error": null,
+  "status": "success",
+  "ticker": "SIDU",
+  "in_trial": true,
+  "asset_type": "STOCK",
+  "trade_plan": {
+    "entry": {
+      "wait_for": "Wait for price to pull back DOWN to $1.96-$1.99 support zone, then BUY. Do not buy at $2.05.",
+      "direction": "LONG",
+      "ideal_zone": {
+        "low": 1.96,
+        "mid": 1.97,
+        "high": 1.99,
+        "confidence": "High probability of bouncing from this former resistance zone"
+      },
+      "current_price": 2.05,
+      "recommendation": "buy_support_bounce"
+    },
+    "exits": {
+      "stop_loss": {
+        "rationale": "Placed below VWAP ($1.94) and the major structural support/PDL ($1.88). If $1.88 breaks, the breakout has failed.",
+        "total_loss": "$80-$100",
+        "price_range": [
+          1.87,
+          1.89
+        ]
+      },
+      "time_stop": {
+        "rationale": "Avoid the 'Lunch Hour Liquidity Void' (12:00-1:00 PM) common in micro-caps.",
+        "date_or_duration": "Close by 11:50 AM ET if targets not met"
+      },
+      "profit_targets": [
+        {
+          "target": 1,
+          "price_range": [
+            2.08,
+            2.12
+          ],
+          "probability": "70% chance (retest of HOD/Resistance)",
+          "position_percent": 50
+        },
+        {
+          "target": 2,
+          "price_range": [
+            2.24,
+            2.28
+          ],
+          "probability": "40% chance (continuation to major resistance)",
+          "position_percent": 50
+        }
+      ]
+    },
+    "trade": true,
+    "verdict": {
+      "action": "BUY STOCK",
+      "reasoning": [
+        "Technical breakout valid: Massive volume injection (>1M shares/min) confirms the move.",
+        "Support/Resistance flip: Previous resistance at $1.95 has shattered and should now act as support on a retest.",
+        "Mike's Methodology: Price is holding above VWAP ($1.94) with stacked EMAs; plan is to enter on the pullback, not chase the high.",
+        "Macro Neutrality: Broad market is flat, allowing this micro-cap to move on its own momentum without headwinds."
+      ],
+      "confidence": "85% confidence - means strong technical alignment with volume confirmation, heavily weighted towards Technical Agent due to idiosyncratic micro-cap nature."
+    },
+    "position": {
+      "max_risk": "$90.00 (0.9% of account)",
+      "quantity": 1000,
+      "rationale": "Mike's Method: Full entry at support level. Volatility is high, so size is calculated based on risk distance to stop.",
+      "unit_type": "shares",
+      "total_cost": "$1,970.00",
+      "size_recommendation": "full"
+    },
+    "synthesis": {
+      "wild_card_risk": "high",
+      "agent_agreement": "partial",
+      "macro_confidence": 65,
+      "conflict_resolution": "Macro is neutral/flat so Technical agent (90% confident) takes full precedence for stock selection. Wild Card agent's high risk assessment necessitates strict limit orders and hard stops.",
+      "technical_confidence": 90
+    },
+    "wild_cards": {
+      "identified_risks": [
+        {
+          "risk": "LULD Halt",
+          "impact": "moderate",
+          "contingency": "If halted down, place limit sell -5% below halt price. Cancel open orders.",
+          "probability": "medium"
+        },
+        {
+          "risk": "Intraday Offering/Dilution",
+          "impact": "severe",
+          "contingency": "Immediate exit on any news regarding 'Offering', 'S-1', or 'Capital Raise'.",
+          "probability": "medium"
+        }
+      ],
+      "honest_uncertainty": "We cannot know if the volume spike is a 'pump' before a dump/offering. The chart looks bullish, but micro-cap fundamentals are opaque.",
+      "manual_checks_required": [
+        "[!] Verify no pending trading halts on Nasdaq trader site",
+        "[!] Check news feed for 'files S-1' or 'offering' keywords"
+      ]
+    },
+    "execution_plan": {
+      "step_1": "Set LIMIT BUY order at $1.97 (mid-point of support zone).",
+      "step_2": "Immediately upon fill, set HARD STOP LOSS at $1.88.",
+      "step_3": "Set OCO (One-Cancels-Other) sell orders for Target 1 ($2.10) and Target 2 ($2.25)."
+    },
+    "no_trade_reason": null
+  },
+  "trade_style": "DAY",
+  "account_size": 10000,
+  "risk_percent": 1,
+  "agent_verdicts": {
+    "macro": {
+      "reasoning": [
+        "Factor 1: SPY and QQQ are effectively unchanged (+0.03% and +0.04%), indicating a pause in directional momentum and a predominantly neutral market regime.",
+        "Factor 2: Cross-asset alignment is tight but lacks magnitude; there is no divergence between Tech and Broad Market to suggest sector rotation.",
+        "Factor 3: Economic data provided is stale (53 days old), creating a 'data vacuum' where price action is likely driven by technicals rather than macro fundamentals.",
+        "Factor 4: In this low-volatility environment, small-cap or speculative tickers (like SIDU) often decouple from the broad market, moving solely on idiosyncratic flow rather than macro tides.",
+        "Factor 5: Missing news and international context reinforces the neutral stance; the market appears to be waiting for the next catalyst."
+      ],
+      "confidence": 65,
+      "market_regime": "neutral",
+      "qqq_direction": "flat",
+      "spy_direction": "flat",
+      "news_sentiment": {
+        "overall": "neutral",
+        "key_themes": [],
+        "major_concerns": []
+      },
+      "session_context": {
+        "type": "regular",
+        "risk_note": "Low volatility environment; risk of chop or low-liquidity drifts."
+      },
+      "economic_assessment": {
+        "inflation_trend": "unknown",
+        "macro_headwinds": [
+          "Stale economic data (53+ days old)",
+          "Lack of immediate catalysts"
+        ],
+        "macro_tailwinds": [
+          "Market stability (low volatility)",
+          "Indices holding support levels"
+        ],
+        "fed_stance_implied": "neutral",
+        "yield_curve_signal": "unknown"
+      },
+      "cross_asset_alignment": "aligned",
+      "intermarket_divergence": "decoupled",
+      "international_assessment": {
+        "gap_bias": "flat",
+        "relevance": "low",
+        "asia_sentiment": "unavailable",
+        "europe_sentiment": "unavailable"
+      }
+    },
+    "technical": {
+      "direction": "long",
+      "reasoning": [
+        "Factor 1: Massive Volume Injection - Last 4 minutes show volume >1M shares/min vs previous average of ~5k. This confirms the breakout legitimacy.",
+        "Factor 2: S/R Transformation - The $1.95-$1.96 level acted as resistance for the previous 200+ bars. Price has shattered this level, flipping it to a MAJOR support zone for entry.",
+        "Factor 3: Mike's Framework - Price is well above VWAP ($1.9381) and moving averages are perfectly stacked (EMA9 > EMA20 > SMA50 > SMA200). Do not chase at $2.05 (RSI 81); wait for the pullback to the $1.96-$1.99 breakout zone to initiate.",
+        "Factor 4: Volatility Expansion - Intra-range expanded from ~5 cents to 16 cents in minutes. Volatility is 'Extreme', requiring wider stops below $1.94."
+      ],
+      "confidence": 90,
+      "entry_type": "pullback_after_breakout",
+      "volatility": "extreme",
+      "options_flow": "unavailable",
+      "mtf_alignment": "aligned",
+      "chart_patterns": [
+        "Parabolic Breakout",
+        "Consolidation Base Breakout ($1.95)",
+        "Volume Explosion"
+      ],
+      "support_levels": {
+        "major": [
+          1.94,
+          1.88
+        ],
+        "minor": [
+          1.99,
+          1.96,
+          1.95
+        ],
+        "key_references": {
+          "pdc": 1.65,
+          "pdl": 1.8899,
+          "weekly_low": 1.86,
+          "monthly_low": 1.85,
+          "opening_range_low": 1.9
+        }
+      },
+      "resistance_levels": {
+        "major": [
+          2.25,
+          2.5
+        ],
+        "minor": [
+          2.06,
+          2.1
+        ],
+        "key_references": {
+          "pdh": 2.06,
+          "weekly_high": 2.06,
+          "monthly_high": 2.06,
+          "opening_range_high": 1.95
+        }
+      }
+    },
+    "wild_card": {
+      "honest_uncertainty": "We cannot predict if a large institutional holder or insider is using this morning liquidity to unload a massive position (hidden seller), which would cap upside regardless of technical patterns.",
+      "timing_considerations": [
+        "9:30-10:00 AM: Maximum volatility zone. Highest risk of whipsaw.",
+        "12:00-1:00 PM: 'No Fly Zone' for micro-caps (low volume/chop risk).",
+        "3:50-4:00 PM: Intraday square-up volatility (aggressive closing of day positions)."
+      ],
+      "wild_cards_identified": [
+        {
+          "type": "systemic",
+          "impact": "moderate",
+          "mitigation": "Do not chase parabolic moves. If stock halts, cancel pending orders immediately to avoid execution on reopening gaps.",
+          "description": "LULD (Limit Up/Limit Down) Circuit Breaker Halt. At 9:34 AM, volatility is peak. If SIDU moves >10% in a 5-minute window, trading will be paused for 5-10 minutes.",
+          "probability": "medium"
+        },
+        {
+          "type": "external_event",
+          "impact": "severe",
+          "mitigation": "Monitor news feeds specifically for keywords: 'Offering', 'S-1', 'Dilution', 'Warrant exercise'. Use a hard stop-loss, mental stops are too slow here.",
+          "description": "Intraday Capital Raise/Direct Offering. SIDU is a micro-cap space stock; these tickers notoriously use high-volume morning spikes to announce offerings or dump shares into liquidity.",
+          "probability": "medium"
+        },
+        {
+          "type": "timing",
+          "impact": "moderate",
+          "mitigation": "Mike's Rule: Avoid entering during lunch. Plan to exit or significantly reduce position size by 11:50 AM ET unless a high-volume breakout to new HOD occurs.",
+          "description": "The Lunch Hour Liquidity Void (12:00 PM - 1:00 PM ET). SIDU is likely a lower float/volume ticker compared to mega-caps. Volume usually vanishes at noon.",
+          "probability": "high"
+        },
+        {
+          "type": "execution",
+          "impact": "minor",
+          "mitigation": "Use LIMIT orders strictly. Do not use Market orders in the first 15 minutes of the session.",
+          "description": "Wide Bid-Ask Spread / Slippage. At 9:34 AM, market makers are still establishing ranges. Spreads on micro-caps can remain wide causing instant P&L drawback upon entry.",
+          "probability": "high"
+        }
+      ],
+      "overall_risk_assessment": "high",
+      "recommended_contingencies": [
+        "Contingency 1 (Halt): If caught in a downward volatility halt, place a limit sell order roughly 5-10% below the halt price to prioritize exit on resumption.",
+        "Contingency 2 (News): If a negative financing/offering headline crosses the wire, hit the 'Close Position' hotkey immediately; do not wait for a chart bounce.",
+        "Contingency 3 (Volume Failure): If volume drops significantly by 10:30 AM without price progress, exit early to avoid the 'slow bleed' trap."
+      ]
+    }
+  },
+  "market_session": {
+    "status": "open",
+    "asset_type": "STOCK",
+    "timing_note": "Regular market hours.",
+    "is_tradeable_now": true,
+    "next_market_open": null
+  },
+  "runs_remaining": 175,
+  "resolved_ticker": null,
+  "pre_trade_checks": {
+    "warnings": [
+      "[!] MANUAL CHECK REQUIRED: Verify economic calendar before trading",
+      "[!] Check for: FOMC, CPI, NFP, GDP releases",
+      "[!] Check for: Earnings if trading stocks/options"
+    ],
+    "major_events": [],
+    "news_summary": "Automated news scraping disabled - check forexfactory.com/calendar manually",
+    "safe_to_trade": true,
+    "critical_events": [],
+    "earnings_upcoming": false,
+    "manual_check_required": true
+  },
+  "requested_ticker": null,
+  "daily_runs_remaining": 46,
+  "resolved_ticker_method": null
+}

@@ -1,0 +1,304 @@
+{
+  "status": "success",
+  "ticker": "SPY",
+  "requested_ticker": null,
+  "resolved_ticker": null,
+  "resolved_ticker_method": null,
+  "asset_type": "OPTIONS",
+  "trade_style": "DAY",
+  "account_size": 10000,
+  "risk_percent": 1,
+  "agent_verdicts": {
+    "technical": {
+      "direction": "long",
+      "confidence": 85,
+      "entry_type": "pullback_after_breakout",
+      "support_levels": {
+        "minor": [
+          687.88,
+          687.64,
+          687.5,
+          687.34
+        ],
+        "major": [
+          686.46,
+          687,
+          686.38
+        ],
+        "key_references": {
+          "pdc": 684.82,
+          "pdl": 683.87,
+          "opening_range_low": 684.2,
+          "weekly_low": 682.5,
+          "monthly_low": 670
+        }
+      },
+      "resistance_levels": {
+        "minor": [
+          687.97,
+          688.15,
+          688.3
+        ],
+        "major": [
+          688.03,
+          690,
+          695
+        ],
+        "key_references": {
+          "pdh": 688.03,
+          "opening_range_high": 685.5,
+          "weekly_high": 688.03,
+          "monthly_high": 688.03
+        }
+      },
+      "chart_patterns": [
+        "bull_flag",
+        "ascending_channel"
+      ],
+      "mtf_alignment": "aligned",
+      "volatility": "normal",
+      "options_flow": "unavailable",
+      "reasoning": [
+        "Confluence of Moving Averages: Price is strictly respecting the stack sequence (Price > EMA9 > SMA20 > SMA50 > SMA100 > SMA200). This indicates a strong, high-conviction intraday trend.",
+        "Mike's Framework Application: Price is currently near the High of Day ($688.03). Per methodology, we do NOT buy the HOD breakout. We wait for the price to come to support. The immediate support zone is the confluence of the SMA20 ($687.88) and EMA9 ($687.91).",
+        "Volume & Momentum: RSI is neutral (52.9) despite the price being near highs, indicating the move is not overextended and has room to run. MACD is positive and aligned. The recent consolidation near $687.95 represents a Bull Flag formation; a dip to $687.88 would be the optimal low-risk entry."
+      ]
+    },
+    "macro": {
+      "market_regime": "risk_on",
+      "confidence": 65,
+      "spy_direction": "up",
+      "qqq_direction": "flat",
+      "cross_asset_alignment": "aligned",
+      "intermarket_divergence": "in_sync",
+      "session_context": {
+        "type": "regular",
+        "risk_note": "Trading near daily high suggests strong intraday momentum"
+      },
+      "economic_assessment": {
+        "inflation_trend": "unknown",
+        "fed_stance_implied": "unknown",
+        "yield_curve_signal": "unknown",
+        "macro_headwinds": [
+          "Data staleness limits visibility on recent inflation trends"
+        ],
+        "macro_tailwinds": [
+          "Price action indicates resilience despite lack of fresh macro catalysts"
+        ]
+      },
+      "news_sentiment": {
+        "overall": "neutral",
+        "key_themes": [],
+        "major_concerns": []
+      },
+      "international_assessment": {
+        "asia_sentiment": "unavailable",
+        "europe_sentiment": "unavailable",
+        "gap_bias": "uncertain",
+        "relevance": "low"
+      },
+      "reasoning": [
+        "Factor 1: SPY is trading up +0.45% and sitting very close to the High of Day ($687.93 vs $688.03), indicating dominance of buyers.",
+        "Factor 2: Market regime is classified as Risk-On based purely on broad market strength, though lack of QQQ data limits sector confirmation.",
+        "Factor 3: Economic data provided is stale (52 days old), meaning the market is likely trading on technicals or news not captured in the macro snapshot.",
+        "Factor 4: Ticker is SPY, so it is inherently in sync with the broad market direction.",
+        "Factor 5: Missing news and specific sector data limits confidence to 65%, preventing a 'high confidence' assessment."
+      ]
+    },
+    "wild_card": {
+      "wild_cards_identified": [
+        {
+          "type": "timing",
+          "description": "Pre-Holiday Liquidity Vacuum",
+          "probability": "high",
+          "impact": "moderate",
+          "mitigation": "Reduce position size; use limit orders strictly; avoid chasing price if spreads widen significantly as desks clear out for the holiday."
+        },
+        {
+          "type": "systemic",
+          "description": "Broker/Exchange Outage close to 4:00 PM",
+          "probability": "low",
+          "impact": "severe",
+          "mitigation": "Have a backup mobile execution method ready; do not wait until 3:59 PM to close the position. Start scaling out at 3:45 PM ET."
+        },
+        {
+          "type": "external_event",
+          "description": "Insiders/Algos front-running tomorrow's Holiday Economic Data (Durable Goods)",
+          "probability": "medium",
+          "impact": "moderate",
+          "mitigation": "Watch for sudden, unexplainable volume spikes unrelated to current price action, suggesting institutional positioning for Wednesday's data."
+        },
+        {
+          "type": "execution",
+          "description": "0DTE Gamma Pininng (Max Pain)",
+          "probability": "medium",
+          "impact": "moderate",
+          "mitigation": "If trading 0DTE options, be aware that Market Makers may try to pin SPY to a specific strike to kill premium. Avoid holding ATM options into the final 15 minutes."
+        }
+      ],
+      "overall_risk_assessment": "moderate",
+      "recommended_contingencies": [
+        "Contingency 1: If SPY freezes in a tight range after 3:30 PM (Theta burn), close immediately. Do not wait for a breakout that may not come.",
+        "Contingency 2: If a 'fat finger' or news spike occurs causing >0.5% move in <1 minute, flatten the position immediately. Do not try to fade it in a low-liquidity environment."
+      ],
+      "timing_considerations": [
+        "Current Time (15:08 ET): Entering Power Hour. Volatility normally increases.",
+        "Holiday Context: It is likely Dec 23rd (Tuesday). Trading volume often thins out early as traders leave for Christmas.",
+        "Hard Stop: Day trades must be closed by 4:00 PM ET. Do not hold overnight into Jobless Claims/Durable Goods on a holiday-shortened week."
+      ],
+      "honest_uncertainty": "We cannot predict the magnitude of 'Market on Close' (MOC) orders at 3:50 PM ET, which often dictate the final direction of the day regardless of technical patterns."
+    }
+  },
+  "trade_plan": {
+    "trade": true,
+    "verdict": {
+      "action": "BUY CALLS",
+      "confidence": "80% confidence - Strong technical trend alignment (MA stack) + Risk-On macro regime. Reduced from 85% slightly due to holiday liquidity risks and time of day (late session).",
+      "reasoning": [
+        "Technical Alignment: Price respecting strictly ordered moving averages (EMA9 > SMA20, etc), signaling a strong trend.",
+        "Macro Confirmation: Risk-on regime supports the bullish technical structure.",
+        "Mike's Methodology: Setup identifies a 'Bull Flag' consolidation. The plan is to wait for the dip to support ($687.88) rather than chasing the HOD breakout.",
+        "Contract Fit: 0DTE contract listed has massive volume and ideal delta (0.46) for an end-of-day scalp."
+      ]
+    },
+    "synthesis": {
+      "technical_confidence": 85,
+      "macro_confidence": 65,
+      "wild_card_risk": "moderate",
+      "agent_agreement": "full",
+      "conflict_resolution": "Agents agree on direction. Technical confidence weighted higher for intraday timing; Macro lower confidence noted but direction aligns."
+    },
+    "entry": {
+      "direction": "LONG",
+      "recommendation": "buy_support_bounce",
+      "ideal_zone": {
+        "low": 687.85,
+        "mid": 687.88,
+        "high": 687.92,
+        "confidence": "High - confluence of SMA20 and EMA9"
+      },
+      "current_price": 687.93,
+      "wait_for": "Wait for price to pull back DOWN to $687.88 support area, then BUY. Do not chase above $688.00."
+    },
+    "position": {
+      "size_recommendation": "full",
+      "rationale": "Cost is very low ($21/contract). Risk is capped by the premium itself. Full position fits well within $100 risk budget.",
+      "quantity": 4,
+      "unit_type": "contracts",
+      "total_cost": "$84.00",
+      "max_risk": "$84.00 (0.84% of account)"
+    },
+    "recommended_contract": {
+      "symbol": "O:SPY251223C00688000",
+      "type": "CALL",
+      "strike": 688,
+      "expiration": "2025-12-23",
+      "days_to_expiration": 0,
+      "moneyness": "ATM",
+      "delta": 0.461,
+      "gamma": 0.694,
+      "theta": -0.595,
+      "vega": 0.064,
+      "implied_volatility": "3.57%",
+      "bid": 0.2,
+      "ask": 0.21,
+      "mid_price": 0.205,
+      "volume": 366965,
+      "open_interest": 18851,
+      "selection_scores": {
+        "price_score": "Excellent - $21/contract allows precise sizing",
+        "volume_score": "Elite - 366k volume indicates massive liquidity",
+        "theta_score": "High negative theta (-0.59) normal for 0DTE power hour",
+        "delta_score": "Perfect (0.46) - balanced leverage",
+        "oi_score": "Great - 18k OI"
+      },
+      "selection_rationale": "Chosen using Mike's Top 5: Massive volume/liquidity is the standout feature here, essential for a late-day scalp. Delta is perfect at 0.46. 0DTE matches the 'Day/Scalp' style for immediate moves."
+    },
+    "exits": {
+      "stop_loss": {
+        "price_range": [
+          0.1,
+          0.15
+        ],
+        "total_loss": "~$40-50",
+        "rationale": "Tech Stop: Underlying SPY closing below $687.50 (loss of momentum). Option Stop: Premium dropping 50% from entry."
+      },
+      "profit_targets": [
+        {
+          "target": 1,
+          "price_range": [
+            0.3,
+            0.35
+          ],
+          "position_percent": 50,
+          "probability": "65% - Test of HOD ($688.03)"
+        },
+        {
+          "target": 2,
+          "price_range": [
+            0.4,
+            0.5
+          ],
+          "position_percent": 50,
+          "probability": "40% - Breakout to $688.30+"
+        }
+      ],
+      "time_stop": {
+        "date_or_duration": "Close by 3:55 PM ET",
+        "rationale": "0DTE Risk: Gamma and Theta risk become extreme in final 15 mins. Avoid MOC imbalance volatility."
+      }
+    },
+    "wild_cards": {
+      "identified_risks": [
+        {
+          "risk": "Pre-Holiday Liquidity Vacuum",
+          "probability": "high",
+          "impact": "moderate",
+          "contingency": "Use LIMIT orders only. Do not market buy."
+        },
+        {
+          "risk": "Gamma Pinning",
+          "probability": "medium",
+          "impact": "moderate",
+          "contingency": "If price sticks to $688.00 and theta eats premium, exit early (3:45 PM)."
+        }
+      ],
+      "manual_checks_required": [
+        "[!] Verify 0DTE margin requirements with broker",
+        "[!] Watch time closely - rigid exit before close"
+      ],
+      "honest_uncertainty": "Late day 'Market On Close' orders are unpredictable and can snap price 10-20 cents in seconds against technicals."
+    },
+    "execution_plan": {
+      "step_1": "Set Limit Buy for 4 contracts at $0.20-0.21 (Wait for underlying spot to tap $687.88).",
+      "step_2": "Immediately set Stop Loss at $0.10 upon fill.",
+      "step_3": "Set Sell Limit for 2 contracts at $0.32.",
+      "step_4": "Hard Close all remaining positions at 3:55 PM ET regardless of P/L."
+    },
+    "no_trade_reason": null
+  },
+  "pre_trade_checks": {
+    "safe_to_trade": true,
+    "warnings": [
+      "[!] MANUAL CHECK REQUIRED: Verify economic calendar before trading",
+      "[!] Check for: FOMC, CPI, NFP, GDP releases",
+      "[!] Check for: Earnings if trading stocks/options"
+    ],
+    "critical_events": [],
+    "news_summary": "Automated news scraping disabled - check forexfactory.com/calendar manually",
+    "earnings_upcoming": false,
+    "major_events": [],
+    "manual_check_required": true
+  },
+  "error": null,
+  "runs_remaining": 175,
+  "in_trial": true,
+  "daily_runs_remaining": 31,
+  "market_session": {
+    "status": "open",
+    "is_tradeable_now": true,
+    "next_market_open": null,
+    "timing_note": "Options market is open.",
+    "asset_type": "OPTIONS"
+  }
+}

@@ -232,7 +232,54 @@ class GrailDatabase:
         ticker: Optional[str] = None,
         asset_type: Optional[str] = None,
         file_created_at: Optional[datetime] = None,
-        file_modified_at: Optional[datetime] = None
+        file_modified_at: Optional[datetime] = None,
+        # Core fields
+        status: Optional[str] = None,
+        error_message: Optional[str] = None,
+        trade_style: Optional[str] = None,
+        account_size: Optional[float] = None,
+        risk_percent: Optional[float] = None,
+        # Trading decision
+        should_trade: Optional[bool] = None,
+        trade_action: Optional[str] = None,
+        trade_confidence_text: Optional[str] = None,
+        trade_confidence_pct: Optional[float] = None,
+        no_trade_reason: Optional[str] = None,
+        # Entry fields
+        entry_direction: Optional[str] = None,
+        entry_price: Optional[float] = None,
+        entry_recommendation: Optional[str] = None,
+        # Position sizing
+        position_quantity: Optional[int] = None,
+        position_unit_type: Optional[str] = None,
+        position_size_recommendation: Optional[str] = None,
+        position_total_cost_text: Optional[str] = None,
+        position_max_risk_text: Optional[str] = None,
+        # Market context
+        market_status: Optional[str] = None,
+        is_tradeable_now: Optional[bool] = None,
+        in_trial: Optional[bool] = None,
+        # API tracking
+        runs_remaining: Optional[int] = None,
+        daily_runs_remaining: Optional[int] = None,
+        # Ticker resolution
+        resolved_ticker: Optional[str] = None,
+        resolved_ticker_method: Optional[str] = None,
+        # Agent confidence
+        technical_confidence: Optional[float] = None,
+        macro_confidence: Optional[float] = None,
+        wild_card_risk: Optional[str] = None,
+        agent_agreement: Optional[str] = None,
+        # Options-specific
+        option_contract_symbol: Optional[str] = None,
+        option_type: Optional[str] = None,
+        option_strike: Optional[float] = None,
+        option_expiration: Optional[str] = None,
+        option_days_to_expiry: Optional[int] = None,
+        option_delta: Optional[float] = None,
+        option_mid_price: Optional[float] = None,
+        option_volume: Optional[int] = None,
+        option_open_interest: Optional[int] = None
     ) -> str:
         """
         Insert or update a grail JSON file in the database.
@@ -283,13 +330,64 @@ class GrailDatabase:
                     file_created_at = %s,
                     file_modified_at = %s,
                     json_content = %s,
+                    status = %s,
+                    error_message = %s,
+                    trade_style = %s,
+                    account_size = %s,
+                    risk_percent = %s,
+                    should_trade = %s,
+                    trade_action = %s,
+                    trade_confidence_text = %s,
+                    trade_confidence_pct = %s,
+                    no_trade_reason = %s,
+                    entry_direction = %s,
+                    entry_price = %s,
+                    entry_recommendation = %s,
+                    position_quantity = %s,
+                    position_unit_type = %s,
+                    position_size_recommendation = %s,
+                    position_total_cost_text = %s,
+                    position_max_risk_text = %s,
+                    market_status = %s,
+                    is_tradeable_now = %s,
+                    in_trial = %s,
+                    runs_remaining = %s,
+                    daily_runs_remaining = %s,
+                    resolved_ticker = %s,
+                    resolved_ticker_method = %s,
+                    technical_confidence = %s,
+                    macro_confidence = %s,
+                    wild_card_risk = %s,
+                    agent_agreement = %s,
+                    option_contract_symbol = %s,
+                    option_type = %s,
+                    option_strike = %s,
+                    option_expiration = %s,
+                    option_days_to_expiry = %s,
+                    option_delta = %s,
+                    option_mid_price = %s,
+                    option_volume = %s,
+                    option_open_interest = %s,
                     updated_at = CURRENT_TIMESTAMP
                 WHERE file_path = %s
                 """
                 self.cursor.execute(
                     update_sql,
                     (ticker, asset_type, content_hash, file_created_at,
-                     file_modified_at, json_content, file_path)
+                     file_modified_at, json_content,
+                     status, error_message, trade_style, account_size, risk_percent,
+                     should_trade, trade_action, trade_confidence_text, trade_confidence_pct,
+                     no_trade_reason, entry_direction, entry_price, entry_recommendation,
+                     position_quantity, position_unit_type, position_size_recommendation,
+                     position_total_cost_text, position_max_risk_text,
+                     market_status, is_tradeable_now, in_trial,
+                     runs_remaining, daily_runs_remaining,
+                     resolved_ticker, resolved_ticker_method,
+                     technical_confidence, macro_confidence, wild_card_risk, agent_agreement,
+                     option_contract_symbol, option_type, option_strike, option_expiration,
+                     option_days_to_expiry, option_delta, option_mid_price,
+                     option_volume, option_open_interest,
+                     file_path)
                 )
                 self.conn.commit()
                 return 'updated'
@@ -298,13 +396,51 @@ class GrailDatabase:
             insert_sql = """
             INSERT INTO grail_files (
                 ticker, asset_type, file_path, content_hash,
-                file_created_at, file_modified_at, json_content
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+                file_created_at, file_modified_at, json_content,
+                status, error_message, trade_style, account_size, risk_percent,
+                should_trade, trade_action, trade_confidence_text, trade_confidence_pct,
+                no_trade_reason, entry_direction, entry_price, entry_recommendation,
+                position_quantity, position_unit_type, position_size_recommendation,
+                position_total_cost_text, position_max_risk_text,
+                market_status, is_tradeable_now, in_trial,
+                runs_remaining, daily_runs_remaining,
+                resolved_ticker, resolved_ticker_method,
+                technical_confidence, macro_confidence, wild_card_risk, agent_agreement,
+                option_contract_symbol, option_type, option_strike, option_expiration,
+                option_days_to_expiry, option_delta, option_mid_price,
+                option_volume, option_open_interest
+            ) VALUES (
+                %s, %s, %s, %s, %s, %s, %s,
+                %s, %s, %s, %s, %s,
+                %s, %s, %s, %s,
+                %s, %s, %s, %s,
+                %s, %s, %s,
+                %s, %s,
+                %s, %s, %s,
+                %s, %s,
+                %s, %s,
+                %s, %s, %s, %s,
+                %s, %s, %s, %s,
+                %s, %s, %s,
+                %s, %s
+            )
             """
             self.cursor.execute(
                 insert_sql,
                 (ticker, asset_type, file_path, content_hash,
-                 file_created_at, file_modified_at, json_content)
+                 file_created_at, file_modified_at, json_content,
+                 status, error_message, trade_style, account_size, risk_percent,
+                 should_trade, trade_action, trade_confidence_text, trade_confidence_pct,
+                 no_trade_reason, entry_direction, entry_price, entry_recommendation,
+                 position_quantity, position_unit_type, position_size_recommendation,
+                 position_total_cost_text, position_max_risk_text,
+                 market_status, is_tradeable_now, in_trial,
+                 runs_remaining, daily_runs_remaining,
+                 resolved_ticker, resolved_ticker_method,
+                 technical_confidence, macro_confidence, wild_card_risk, agent_agreement,
+                 option_contract_symbol, option_type, option_strike, option_expiration,
+                 option_days_to_expiry, option_delta, option_mid_price,
+                 option_volume, option_open_interest)
             )
             self.conn.commit()
             return 'inserted'

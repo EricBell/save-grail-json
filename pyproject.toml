@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "save-grail-json"
-version = "0.2.0"
+version = "0.2.1"
 description = "A tool to save grail JSON docs to a database for later review and analysis"
 authors = [{name = "Eric Bell"}]
 license = {text = "GPL-3.0"}
