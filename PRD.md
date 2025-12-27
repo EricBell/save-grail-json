@@ -63,6 +63,20 @@ save-grail-json file1.json file2.json file3.json
 save-grail-json data/*.json
 ```
 
+**CLI Output Format:**
+The CLI provides clear status indicators for each file:
+- `✓ file.json (new)` - File successfully inserted as new record
+- `↻ file.json (updated)` - Existing file updated with new content
+- `⊘ file.json (duplicate content, skipped)` - Same content already exists in database
+- `✗ file.json: error message` - Error during processing
+
+**Summary Report:**
+After processing, a summary is displayed showing:
+- Inserted (new): Count of new files added
+- Updated (changed): Count of existing files updated
+- Skipped (duplicates): Count of duplicate content skipped
+- Errors: Count of files that failed processing
+
 ### 4.3 TUI Mode
 
 - **FR-3.1:** The system shall provide an interactive terminal user interface
@@ -158,6 +172,24 @@ uv run save-grail-json --version
 6. Updated version files are automatically staged in the commit
 7. Commit proceeds with version bump included
 
+### 4.6 Testing Requirements
+
+- **FR-8.1:** The system shall include unit tests for configuration loading and validation
+- **FR-8.2:** The system shall include unit tests for JSON ingestion and field extraction
+- **FR-8.3:** The system shall include unit tests for database operations (insert, update, duplicate detection)
+- **FR-8.4:** The system shall include integration tests for CLI mode operations
+- **FR-8.5:** The system shall include integration tests for database schema creation and migrations
+- **FR-8.6:** The system shall provide sample JSON files for testing and demonstration purposes
+- **FR-8.7:** Tests shall be runnable via `uv run pytest tests/`
+- **FR-8.8:** Tests shall use a separate test database to avoid affecting production data
+
+### 4.7 Development and Maintenance Utilities
+
+- **FR-9.1:** The system shall provide a `drop-tables.py` utility for development database cleanup
+- **FR-9.2:** The drop tables utility shall only affect the grail_files table (safe for development)
+- **FR-9.3:** The system shall provide an `install-hooks.sh` script for setting up git hooks
+- **FR-9.4:** The git pre-commit hook shall automatically increment version on file changes
+
 ## 5. Data Model
 
 ### 5.1 Database Schema
@@ -210,6 +242,33 @@ CREATE INDEX IF NOT EXISTS idx_content_hash ON grail_files(content_hash);
 - **JSONB data type**: Enables efficient JSON querying, indexing, and validation
 - **content_hash**: SHA256 hash for duplicate content detection (different from file_path)
 - **updated_at**: Tracks when existing records are updated with new content
+
+### 5.3 Duplicate Detection and Update Logic
+
+**Duplicate Detection:**
+The system uses a two-tier approach to prevent duplicates and handle updates:
+
+1. **Content Hash Check**: SHA256 hash of JSON content
+   - If same content exists (regardless of file path) → **Skip as duplicate**
+   - Prevents ingesting identical JSON from different locations
+
+2. **File Path Check**: Absolute file path
+   - If same path exists with different content → **Update the record**
+   - Allows tracking content changes over time
+
+**Behavior Matrix:**
+
+| Scenario | file_path | content_hash | Action | Result |
+|----------|-----------|--------------|--------|--------|
+| New file | Not exists | Not exists | INSERT | `inserted` |
+| Same file, same content | Exists | Exists | SKIP | `duplicate` |
+| Same file, changed content | Exists | Not exists | UPDATE | `updated` |
+| Different file, same content | Not exists | Exists | SKIP | `duplicate` |
+
+**Migration Support:**
+- Existing databases without `content_hash` column are automatically migrated
+- Migration computes hashes for all existing records
+- TEXT to JSONB migration is automatic and transparent
 
 ### 5.2 Example JSON Structure
 
@@ -264,24 +323,30 @@ save-grail-json/
 │   ├── database.py          # Database operations (PostgreSQL)
 │   ├── ingestion.py         # JSON file reading and processing
 │   └── tui.py               # TUI implementation with Textual
-├── tests/
-│   ├── test_ingestion.py
-│   ├── test_database.py
-│   ├── test_config.py
-│   └── test_cli.py
+├── tests/                   # ⚠️ NOT YET IMPLEMENTED
+│   ├── __init__.py
+│   ├── test_config.py       # Tests for configuration loading
+│   ├── test_ingestion.py    # Tests for JSON ingestion
+│   ├── test_database.py     # Tests for database operations
+│   ├── test_cli.py          # Integration tests for CLI
+│   └── fixtures/            # Sample JSON files for testing
+│       ├── valid_stock.json
+│       ├── invalid_json.json
+│       └── missing_fields.json
 ├── .git/
 │   └── hooks/
 │       └── pre-commit       # Git pre-commit hook for version auto-increment
 ├── version_manager.py       # Version management CLI and automation
 ├── install-hooks.sh         # Script to install git hooks
+├── drop-tables.py           # Development utility to drop database tables
 ├── .version_hashes.json     # File hashes for change detection (gitignored)
 ├── .gitignore              # Git ignore patterns
 ├── pyproject.toml          # Project metadata and dependencies (source of version)
 ├── uv.lock                 # UV lockfile for reproducible installs
 ├── PRD.md                  # This document
 ├── CLAUDE.md               # Developer guidance
-├── README.md
-└── LICENSE
+├── README.md               # ⚠️ Needs expansion with usage examples
+└── LICENSE                 # GPL-3.0
 ```
 
 ### 6.4 Configuration
@@ -344,13 +409,24 @@ save-grail-json/
 
 ## 8. Success Criteria
 
+### Implemented (v0.2.0)
 - ✅ Successfully ingest JSON files via CLI
 - ✅ Successfully ingest JSON files via TUI
 - ✅ Extract and store required fields (ticker, asset_type, timestamps)
-- ✅ Store complete JSON content
+- ✅ Store complete JSON content in JSONB format
 - ✅ Navigate filesystem in TUI mode
 - ✅ Handle errors gracefully without data loss
 - ✅ Query stored data via basic SQL queries
+- ✅ Content hash duplicate detection (SHA256)
+- ✅ Update existing records when file content changes
+- ✅ Automatic database and table creation
+- ✅ Migration system for schema upgrades
+- ✅ Version management with automatic incrementing
+
+### Not Yet Implemented
+- ❌ Unit tests for core functionality (FR-8.1 through FR-8.5)
+- ❌ Comprehensive README with examples and usage guide
+- ❌ Sample JSON files for testing and demonstration
 
 ## 9. Future Considerations
 
@@ -372,18 +448,55 @@ save-grail-json/
 - Custom field extraction configuration
 - Configuration profiles (multiple database servers)
 
-## 10. Open Questions
+## 10. Resolved Design Decisions
 
-1. Should duplicate files (same path) be re-ingested or skipped?
-   - **Decision:** Skip automatically - `file_path` has UNIQUE constraint; attempting to insert duplicate will raise error
-2. How to handle files with missing ticker or asset_type fields?
-   - **Decision:** Store as NULL, log a warning
-3. Should the TUI allow recursive directory selection?
-   - **Decision:** Phase 2 feature
-4. Database backup strategy?
-   - **Decision:** User responsibility, document PostgreSQL backup commands in README
-5. Should database credentials support multiple profiles/servers?
-   - **Decision:** MVP uses `~/.config/postgres/default.toml` only; multi-profile support in Phase 2
+### 10.1 Duplicate Handling
+**Question:** Should duplicate files (same path) be re-ingested or skipped?
+
+**Decision:** Intelligent handling based on content hash:
+- Same path + same content = Skip as duplicate
+- Same path + different content = Update the existing record
+- Different path + same content = Skip as duplicate (content already stored)
+
+**Implementation:** Two-tier uniqueness constraint on both `file_path` and `content_hash`
+
+### 10.2 Missing Field Handling
+**Question:** How to handle files with missing ticker or asset_type fields?
+
+**Decision:** Store as NULL with no warnings (optional fields)
+
+**Rationale:** Not all JSON files will have these fields; system preserves complete JSON content regardless
+
+### 10.3 TUI Recursive Selection
+**Question:** Should the TUI allow recursive directory selection?
+
+**Decision:** Phase 2 feature
+
+**Current Implementation:** Manual navigation with 'u' key for parent directory
+
+### 10.4 Database Backup Strategy
+**Question:** What backup strategy should the system provide?
+
+**Decision:** User responsibility; document PostgreSQL backup commands in README
+
+**Rationale:** PostgreSQL provides robust backup tools (`pg_dump`, `pg_basebackup`); reinventing them is out of scope
+
+### 10.5 Multiple Database Profiles
+**Question:** Should database credentials support multiple profiles/servers?
+
+**Decision:** Single profile in MVP; multi-profile support in Phase 2
+
+**Current Implementation:** One config file at `~/.config/postgres/save-grail-json.toml`, overridable via `--config` flag
+
+### 10.6 Storage Format
+**Question:** Should JSON content be stored as TEXT or JSONB?
+
+**Decision:** JSONB for query performance and validation
+
+**Implementation:**
+- JSONB storage enables PostgreSQL JSON operators and indexing
+- Automatic migration from TEXT to JSONB for existing installations
+- Complete JSON preservation regardless of format
 
 ## 11. Appendix
 
@@ -488,3 +601,4 @@ save-grail-json file.json
 | 1.2 | 2025-12-23 | Eric Bell / Claude | Changed config to `~/.config/postgres/save-grail-json.toml` (app-specific pattern) |
 | 1.3 | 2025-12-23 | Eric Bell / Claude | Added TUI parent directory navigation ('u' key) |
 | 1.4 | 2025-12-23 | Eric Bell / Claude | Added version management system (FR-5.1 through FR-5.8), version_manager.py, git hooks, updated dependencies and file structure |
+| 1.5 | 2025-12-26 | Eric Bell / Claude | Comprehensive review update: Added testing requirements (FR-8.1-8.8), development utilities (FR-9.1-9.4), duplicate detection logic (Section 5.3), resolved design decisions (Section 10), updated success criteria to reflect implementation status, documented missing components (tests, comprehensive README) |
