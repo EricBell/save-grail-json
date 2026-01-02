@@ -252,23 +252,23 @@ def ingest_json_file(file_path: str) -> GrailFileData:
     risk_percent = _safe_float(data.get('risk_percent'))
 
     # Extract trading decision fields
-    trade_plan = data.get('trade_plan', {})
+    trade_plan = data.get('trade_plan') or {}
     should_trade = _safe_bool(trade_plan.get('trade'))
 
-    verdict = trade_plan.get('verdict', {})
+    verdict = trade_plan.get('verdict') or {}
     trade_action = verdict.get('action')
     trade_confidence_text = verdict.get('confidence')
     trade_confidence_pct = _extract_confidence_pct(trade_confidence_text)
     no_trade_reason = trade_plan.get('no_trade_reason')
 
     # Extract entry fields
-    entry = trade_plan.get('entry', {})
+    entry = trade_plan.get('entry') or {}
     entry_direction = entry.get('direction')
     entry_price = _safe_float(entry.get('current_price'))
     entry_recommendation = entry.get('recommendation')
 
     # Extract position sizing fields
-    position = trade_plan.get('position', {})
+    position = trade_plan.get('position') or {}
     position_quantity = _safe_int(position.get('quantity'))
     position_unit_type = position.get('unit_type')
     position_size_recommendation = position.get('size_recommendation')
@@ -276,7 +276,7 @@ def ingest_json_file(file_path: str) -> GrailFileData:
     position_max_risk_text = position.get('max_risk')
 
     # Extract market context fields
-    market_session = data.get('market_session', {})
+    market_session = data.get('market_session') or {}
     market_status = market_session.get('status')
     is_tradeable_now = _safe_bool(market_session.get('is_tradeable_now'))
     in_trial = _safe_bool(data.get('in_trial'))
@@ -290,13 +290,13 @@ def ingest_json_file(file_path: str) -> GrailFileData:
     resolved_ticker_method = data.get('resolved_ticker_method')
 
     # Extract agent confidence fields
-    agent_verdicts = data.get('agent_verdicts', {})
-    technical = agent_verdicts.get('technical', {})
-    macro = agent_verdicts.get('macro', {})
+    agent_verdicts = data.get('agent_verdicts') or {}
+    technical = agent_verdicts.get('technical') or {}
+    macro = agent_verdicts.get('macro') or {}
     technical_confidence = _safe_float(technical.get('confidence'))
     macro_confidence = _safe_float(macro.get('confidence'))
 
-    synthesis = trade_plan.get('synthesis', {})
+    synthesis = trade_plan.get('synthesis') or {}
     wild_card_risk = synthesis.get('wild_card_risk')
     agent_agreement = synthesis.get('agent_agreement')
 
@@ -312,7 +312,7 @@ def ingest_json_file(file_path: str) -> GrailFileData:
     option_open_interest = None
 
     if asset_type == 'OPTIONS':
-        recommended_contract = trade_plan.get('recommended_contract', {})
+        recommended_contract = trade_plan.get('recommended_contract') or {}
         option_contract_symbol = recommended_contract.get('symbol')
         option_type = recommended_contract.get('type')
         option_strike = _safe_float(recommended_contract.get('strike'))
